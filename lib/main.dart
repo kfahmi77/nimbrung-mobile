@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:nimbrung_mobile/themes/app_fonts.dart';
+
+import 'themes/app_theme.dart';
 
 void main() {
   runApp(const MainApp());
@@ -11,6 +14,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: AppTheme.lightTheme,
       home: Scaffold(
         body: Center(
           child: Column(
@@ -22,14 +26,14 @@ class MainApp extends StatelessWidget {
               ),
               Text(
                 'Hello World!',
-                style: TextStyle(
-                  fontFamily: 'SourceSansPro',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 24,
-                ),
+                style: TextStyle(fontFamily: 'SourceSansPro', fontSize: 24),
               ),
             ],
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.add),
         ),
       ),
     );
