@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_svg: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +18,16 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
+  fonts:
+    - family: SourceSansPro
+      fonts:
+        - asset: assets/fonts/source-sans-pro/SourceSansPro-Regular.ttf
+        - asset: assets/fonts/source-sans-pro/SourceSansPro-Italic.ttf
+          style: italic
+        - asset: assets/fonts/source-sans-pro/SourceSansPro-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/source-sans-pro/SourceSansPro-BoldItalic.ttf
+          weight: 700
+          style: italic
