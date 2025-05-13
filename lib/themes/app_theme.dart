@@ -19,7 +19,7 @@ class AppTheme {
       onSecondary: AppColors.textPrimary,
       error: AppColors.danger,
       onError: Colors.white,
-      surface: AppColors.secondary,
+      surface: AppColors.background,
       onSurface: AppColors.textPrimary,
     ),
     textTheme: appTextTheme,
