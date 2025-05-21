@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nimbrung_mobile/pages/register%20update/register_update_page.dart';
 import 'package:nimbrung_mobile/pages/register/register_page.dart';
 
 import 'pages/login/login_page.dart';
@@ -15,7 +16,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: AppTheme.lightTheme,
-      home: Scaffold(body: RegisterPage()),
+      home: Scaffold(body: RegisterUpdatePage()),
     );
   }
 }
