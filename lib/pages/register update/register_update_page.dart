@@ -10,10 +10,6 @@ class RegisterUpdatePage extends StatefulWidget {
 }
 
 class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
-  bool _isPasswordVisible = false;
-  String? _selectedGender;
-  final List<String> _genders = ['Laki-laki', 'Perempuan'];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
