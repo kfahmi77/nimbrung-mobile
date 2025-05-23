@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/themes/color_schemes.dart';
 
 class RegisterUpdatePage extends StatefulWidget {
@@ -52,7 +53,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                       left: 24,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             'Isi Data ya',
                             style: TextStyle(
@@ -61,7 +62,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                               color: AppColors.background,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          4.height,
                           Text(
                             'Biar tau kamu itu suka di bidang apa',
                             style: TextStyle(
@@ -90,7 +91,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 24),
+                    24.height,
                     const Text(
                       'Tambah Foto',
                       style: TextStyle(
@@ -99,7 +100,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                         color: Color(0xFF4F4F4F),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    16.height,
                     Center(
                       child: Stack(
                         alignment: Alignment.bottomRight,
@@ -135,7 +136,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    24.height,
                     const Text(
                       'Bio',
                       style: TextStyle(
@@ -144,7 +145,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                         color: Color(0xFF4F4F4F),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    8.height,
                     TextField(
                       maxLines: 3,
                       decoration: InputDecoration(
@@ -162,7 +163,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    24.height,
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -177,8 +178,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                         Icon(Icons.info_outline, color: Colors.grey[600]),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    // TODO: Populate with actual list of fields and handle selection
+                    8.height,
                     DropdownButtonFormField<String>(
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -203,7 +203,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                             Icons.category_outlined,
                             color: Colors.grey[700],
                           ), // Placeholder icon
-                          const SizedBox(width: 8),
+                          8.height,
                           const Text('Pilih bidangmu'),
                         ],
                       ),
@@ -227,7 +227,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                         print('Selected field: $newValue');
                       },
                     ),
-                    const SizedBox(height: 32),
+                    32.height,
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,

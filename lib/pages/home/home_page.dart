@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/themes/color_schemes.dart';
 
 class HomePage extends StatelessWidget {
@@ -37,7 +38,8 @@ class HomePage extends StatelessWidget {
                               'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
                             ),
                           ),
-                          SizedBox(width: 12),
+
+                          12.height,
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -73,7 +75,7 @@ class HomePage extends StatelessWidget {
                               height: 22,
                             ),
                           ),
-                          SizedBox(width: 8),
+                          8.width,
                           Container(
                             padding: EdgeInsets.all(8),
                             decoration: BoxDecoration(
@@ -88,7 +90,7 @@ class HomePage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 24),
+                      24.height,
 
                       // Greeting
                       Text(
@@ -99,7 +101,7 @@ class HomePage extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      SizedBox(height: 16),
+                      16.height,
 
                       // Quote text
                       Text(
@@ -120,7 +122,7 @@ class HomePage extends StatelessWidget {
                           height: 1.4,
                         ),
                       ),
-                      SizedBox(height: 16),
+                      16.height,
 
                       // Source
                       Text(
@@ -131,7 +133,7 @@ class HomePage extends StatelessWidget {
                           fontStyle: FontStyle.italic,
                         ),
                       ),
-                      SizedBox(height: 24),
+                      24.height,
 
                       // Action buttons
                       Row(
@@ -157,7 +159,7 @@ class HomePage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          SizedBox(width: 12),
+                          12.width,
                           Container(
                             padding: EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -170,7 +172,7 @@ class HomePage extends StatelessWidget {
                               size: 22,
                             ),
                           ),
-                          SizedBox(width: 8),
+                          8.width,
                           Container(
                             padding: EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -183,7 +185,7 @@ class HomePage extends StatelessWidget {
                               size: 22,
                             ),
                           ),
-                          SizedBox(width: 8),
+                          8.width,
                           Container(
                             padding: EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -198,7 +200,7 @@ class HomePage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      20.height,
                     ],
                   ),
                 ),
@@ -219,8 +221,7 @@ class HomePage extends StatelessWidget {
                       color: Colors.black87,
                     ),
                   ),
-                  SizedBox(height: 16),
-
+                  16.height,
                   // Book review card
                   Container(
                     decoration: BoxDecoration(
@@ -271,7 +272,7 @@ class HomePage extends StatelessWidget {
                                     color: Colors.black87,
                                   ),
                                 ),
-                                SizedBox(height: 4),
+                                4.height,
                                 Text(
                                   'Penulis buku',
                                   style: TextStyle(
@@ -279,7 +280,7 @@ class HomePage extends StatelessWidget {
                                     color: Colors.grey[600],
                                   ),
                                 ),
-                                SizedBox(height: 12),
+                                12.height,
                                 Text(
                                   'Lorem ipsum dolor sit amet consectetur. Consectetur ac convallis urna eros augue faucibus augue eros. Vitae nisl neque suspendisse risus egestas volutpat sit laoreet quam. Odio suscipit pellentesque a sit blandit arcu et dapibus.',
                                   style: TextStyle(

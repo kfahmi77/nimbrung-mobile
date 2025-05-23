@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/themes/color_schemes.dart';
 
 class LoginPage extends StatefulWidget {
@@ -92,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    20.height,
                     const Text(
                       'Email',
                       style: TextStyle(
@@ -101,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                         color: Color(0xFF4F4F4F),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    8.height,
                     TextField(
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
@@ -125,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    14.height,
                     const Text(
                       'Sandi',
                       style: TextStyle(
@@ -134,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
                         color: Color(0xFF4F4F4F),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    8.height,
                     TextField(
                       obscureText: !_isPasswordVisible,
                       decoration: InputDecoration(
@@ -171,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 14),
+                    14.height,
                     Text(
                       'Lupa sandi?',
                       style: TextStyle(
@@ -179,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(height: 14),
+                    14.height,
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
@@ -199,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    24.height,
                     ElevatedButton.icon(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
@@ -219,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
                       icon: SvgPicture.asset('assets/images/google_logo.svg'),
                     ),
 
-                    const SizedBox(height: 30),
+                    30.height,
                     Center(
                       child: GestureDetector(
                         onTap: () {},
@@ -240,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    20.height,
                   ],
                 ),
               ),
