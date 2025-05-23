@@ -297,7 +297,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     30.height,
                     Center(
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () => Navigator.pop(context),
                         child: RichText(
                           text: const TextSpan(
                             text: 'Sudah punya akun? ',

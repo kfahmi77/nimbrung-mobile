@@ -33,13 +33,17 @@ class HomePage extends StatelessWidget {
                       Row(
                         children: [
                           CircleAvatar(
-                            radius: 20,
-                            backgroundImage: NetworkImage(
-                              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+                            radius: 22,
+                            backgroundColor: Colors.white,
+                            child: CircleAvatar(
+                              radius: 20,
+                              backgroundImage: NetworkImage(
+                                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+                              ),
                             ),
                           ),
 
-                          12.height,
+                          12.width,
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -146,7 +150,7 @@ class HomePage extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(25),
+                                borderRadius: BorderRadius.circular(18),
                               ),
                               child: Text(
                                 'Mulai Nimbrung Yuk . . .',
@@ -320,7 +324,7 @@ class HomePage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Icon(Icons.home, color: Colors.white, size: 28),
+              Icon(Icons.home_rounded, color: Colors.white, size: 28),
               Icon(Icons.search, color: Colors.white, size: 28),
               Icon(Icons.menu_book, color: Colors.white, size: 28),
               Icon(Icons.person, color: Colors.white, size: 28),

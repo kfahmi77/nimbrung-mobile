@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nimbrung_mobile/core/routes/route_name.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/themes/color_schemes.dart';
 
@@ -190,7 +192,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         minimumSize: const Size(double.infinity, 50),
                       ),
-                      onPressed: () {},
+                      onPressed:
+                          () => context.pushReplacementNamed(RouteNames.home),
                       child: const Text(
                         'Masuk',
                         style: TextStyle(
@@ -223,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
                     30.height,
                     Center(
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () => context.pushNamed(RouteNames.register),
                         child: RichText(
                           text: const TextSpan(
                             text: 'Belum punya akun? ',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:nimbrung_mobile/core/routes/app_route.dart';
 import 'package:nimbrung_mobile/pages/home/home_page.dart';
-import 'package:nimbrung_mobile/pages/register%20update/register_update_page.dart';
+import 'package:nimbrung_mobile/pages/register_update/register_update_page.dart';
 import 'package:nimbrung_mobile/pages/register/register_page.dart';
 
 import 'pages/login/login_page.dart';
@@ -15,10 +16,10 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: Scaffold(body: HomePage()),
+      routerConfig: appRouter,
     );
   }
 }
