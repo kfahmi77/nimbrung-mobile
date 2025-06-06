@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
+import 'package:nimbrung_mobile/core/widgets/custom_date_form_field.dart';
+import 'package:nimbrung_mobile/core/widgets/custom_drop_down_field.dart';
+import 'package:nimbrung_mobile/core/widgets/profile_photo_picker.dart';
 import 'package:nimbrung_mobile/themes/color_schemes.dart';
+
+import '../../core/widgets/custom_text_field.dart';
 
 class RegisterUpdatePage extends StatefulWidget {
   const RegisterUpdatePage({super.key});
@@ -11,6 +16,47 @@ class RegisterUpdatePage extends StatefulWidget {
 }
 
 class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
+  DateTime? _selectedDate;
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _placeController = TextEditingController();
+  final List<String> _field = ['Teknologi', 'Sains', 'Sejarah', 'Agama'];
+  String? _selectedField;
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    _placeController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime(2000),
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primary,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _dateController.text =
+            "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +101,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Isi Data ya',
+                            'Perbarui Data ya',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -64,7 +110,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                           ),
                           4.height,
                           Text(
-                            'Biar tau kamu itu suka di bidang apa',
+                            'Biar kami bisa mengenalmu lebih baik :)',
                             style: TextStyle(
                               fontSize: 16,
                               color: AppColors.secondary,
@@ -77,7 +123,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                       bottom: -1,
                       right: 18,
                       child: SvgPicture.asset(
-                        'assets/images/onboarding-page-image.svg', // Assuming this is the illustration on the right
+                        'assets/images/onboarding-page-image.svg',
                         width: 120,
                         height: 118,
                         fit: BoxFit.contain,
@@ -92,141 +138,74 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     24.height,
-                    const Text(
-                      'Tambah Foto',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF4F4F4F),
-                      ),
-                    ),
-                    16.height,
-                    Center(
-                      child: Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(
-                            radius: 60,
-                            backgroundColor: AppColors.textPrimary,
-                            child: CircleAvatar(
-                              radius: 59,
-                              backgroundColor: Colors.grey[300],
-                              child: Icon(
-                                Icons.person,
-                                size: 60,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              icon: const Icon(Icons.add, color: Colors.white),
-                              onPressed: () {
-                                // TODO: Implement image picker from camera/gallery
-                                print(
-                                  'Add photo pressed',
-                                ); // Placeholder action
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                    Center(child: ProfilePhotoPicker(label: "Foto Profil")),
+                    24.height,
+                    8.height,
+                    CustomTextField(
+                      label: 'Bio',
+                      maxLines: 3,
+                      hintText: 'Tuliskan tentang dirimu :)',
+                      controller: null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'bio tidak boleh kosong';
+                        }
+                        if (value.length < 3) {
+                          return 'bio minimal 3 karakter';
+                        }
+                        return null;
+                      },
                     ),
                     24.height,
-                    const Text(
-                      'Bio',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF4F4F4F),
-                      ),
-                    ),
-                    8.height,
-                    TextField(
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: 'bisa jelaskan tentang dirimu :)',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide(
-                            color: AppColors.primary,
-                            width: 2,
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: CustomTextField(
+                            label: 'Data Diri',
+                            hintText: 'Masukan tempat lahir',
+                            controller: null,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Username tidak boleh kosong';
+                              }
+                              if (value.length < 3) {
+                                return 'Username minimal 3 karakter';
+                              }
+                              return null;
+                            },
                           ),
                         ),
-                      ),
+                        12.width,
+                        Expanded(
+                          flex: 2,
+                          child: CustomDateField(
+                            label: "",
+                            hintText: "Masukan tanggal lahir",
+                            controller: _dateController,
+                          ),
+                        ),
+                      ],
                     ),
                     24.height,
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Pilih Bidang',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF4F4F4F),
-                          ),
-                        ),
-                        Icon(Icons.info_outline, color: Colors.grey[600]),
-                      ],
+                      children: [],
                     ),
                     8.height,
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide(color: Colors.grey[400]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                          borderSide: BorderSide(
-                            color: AppColors.primary,
-                            width: 2,
-                          ),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 16,
-                        ), // Adjusted padding
-                      ),
-                      hint: Row(
-                        children: [
-                          Icon(
-                            Icons.category_outlined,
-                            color: Colors.grey[700],
-                          ), // Placeholder icon
-                          8.height,
-                          const Text('Pilih bidangmu'),
-                        ],
-                      ),
-                      value: 'Psikologi', // Default or selected value
-                      icon: const Icon(Icons.keyboard_arrow_down),
-                      items:
-                          <String>[
-                            'Psikologi',
-                            'Teknologi',
-                            'Seni',
-                            'Olahraga',
-                          ] // Example items
-                          .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
+                    CustomDropdownField<String>(
+                      label: 'Bidang',
+                      hintText: 'Pilih bidang favoritmu',
+                      value: _selectedField,
+                      items: _field,
+                      itemLabel: (gender) => gender,
                       onChanged: (String? newValue) {
-                        // TODO: Handle field selection
-                        print('Selected field: $newValue');
+                        setState(() {
+                          _selectedField = newValue;
+                        });
                       },
                     ),
+
                     32.height,
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -237,9 +216,13 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                         ),
                         minimumSize: const Size(double.infinity, 50),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        // TODO: Handle form submission
+                        print('Place of birth: ${_placeController.text}');
+                        print('Date of birth: ${_dateController.text}');
+                      },
                       child: const Text(
-                        'Lanjut',
+                        'Masuk',
                         style: TextStyle(
                           fontSize: 18,
                           color: Colors.white,
@@ -250,6 +233,7 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
                   ],
                 ),
               ),
+              28.height,
             ],
           ),
         ),
