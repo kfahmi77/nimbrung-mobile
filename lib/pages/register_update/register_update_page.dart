@@ -16,7 +16,6 @@ class RegisterUpdatePage extends StatefulWidget {
 }
 
 class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
-  DateTime? _selectedDate;
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _placeController = TextEditingController();
   final List<String> _field = ['Teknologi', 'Sains', 'Sejarah', 'Agama'];
@@ -27,34 +26,6 @@ class _RegisterUpdatePageState extends State<RegisterUpdatePage> {
     _dateController.dispose();
     _placeController.dispose();
     super.dispose();
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime(2000),
-      firstDate: DateTime(1950),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-        _dateController.text =
-            "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
-      });
-    }
   }
 
   @override

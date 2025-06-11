@@ -1,96 +1,91 @@
-class ReadingReview {
-  final int id;
-  final String title;
-  final String content;
-  final Category category;
-  final Author author;
-  final String coverImageUrl;
-  final String reference;
+import '../core/models/api_error.dart';
+import '../core/models/base_response.dart';
+import '../core/models/meta.dart';
+import '../domain/entities/resension.dart';
 
-  ReadingReview({
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.category,
-    required this.author,
-    required this.coverImageUrl,
-    required this.reference,
+class ReadingReviewModel extends ReadingReview {
+  const ReadingReviewModel({
+    required super.id,
+    required super.title,
+    required super.content,
+    required super.category,
+    required super.author,
+    required super.coverImageUrl,
+    required super.reference,
   });
 
-  factory ReadingReview.fromJson(Map<String, dynamic> json) {
-    return ReadingReview(
-      id: json['id'],
-      title: json['title'],
-      content: json['content'],
-      category: Category.fromJson(json['category']),
-      author: Author.fromJson(json['author']),
-      coverImageUrl: json['cover_image_url'],
-      reference: json['reference'],
+  factory ReadingReviewModel.fromJson(Map<String, dynamic> json) {
+    return ReadingReviewModel(
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      content: json['content'] ?? '',
+      category: CategoryModel.fromJson(json['category'] ?? {}),
+      author: AuthorModel.fromJson(json['author'] ?? {}),
+      coverImageUrl: json['cover_image_url'] ?? '',
+      reference: json['reference'] ?? '',
     );
   }
-}
 
-class Category {
-  final int id;
-  final String name;
-
-  Category({required this.id, required this.name});
-
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(id: json['id'], name: json['name']);
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content,
+      'category': (category as CategoryModel).toJson(),
+      'author': (author as AuthorModel).toJson(),
+      'cover_image_url': coverImageUrl,
+      'reference': reference,
+    };
   }
 }
 
-class Author {
-  final int id;
-  final String name;
+class CategoryModel extends Category {
+  const CategoryModel({required super.id, required super.name});
 
-  Author({required this.id, required this.name});
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(id: json['id'] ?? 0, name: json['name'] ?? '');
+  }
 
-  factory Author.fromJson(Map<String, dynamic> json) {
-    return Author(id: json['id'], name: json['name']);
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name};
   }
 }
 
-class ReadingReviewResponse {
-  final bool success;
-  final String message;
-  final int statusCode;
-  final List<ReadingReview> data;
-  final dynamic error;
-  final Meta meta;
+class AuthorModel extends Author {
+  const AuthorModel({required super.id, required super.name});
 
-  ReadingReviewResponse({
-    required this.success,
-    required this.message,
-    required this.statusCode,
-    required this.data,
-    required this.error,
-    required this.meta,
+  factory AuthorModel.fromJson(Map<String, dynamic> json) {
+    return AuthorModel(id: json['id'] ?? 0, name: json['name'] ?? '');
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name};
+  }
+}
+
+class ReadingReviewResponse extends BaseResponse<List<ReadingReviewModel>> {
+  const ReadingReviewResponse({
+    required super.success,
+    required super.message,
+    required super.statusCode,
+    super.data,
+    super.error,
+    required super.meta,
   });
 
   factory ReadingReviewResponse.fromJson(Map<String, dynamic> json) {
     return ReadingReviewResponse(
-      success: json['success'],
-      message: json['message'],
-      statusCode: json['status_code'],
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      statusCode: json['status_code'] ?? 0,
       data:
-          (json['data'] as List)
-              .map((item) => ReadingReview.fromJson(item))
-              .toList(),
-      error: json['error'],
-      meta: Meta.fromJson(json['meta']),
+          json['data'] != null
+              ? (json['data'] as List)
+                  .map((item) => ReadingReviewModel.fromJson(item))
+                  .toList()
+              : null,
+      error: json['error'] != null ? ApiError.fromJson(json['error']) : null,
+      meta: Meta.fromJson(json['meta'] ?? {}),
     );
-  }
-}
-
-class Meta {
-  final String timestamp;
-  final String requestId;
-
-  Meta({required this.timestamp, required this.requestId});
-
-  factory Meta.fromJson(Map<String, dynamic> json) {
-    return Meta(timestamp: json['timestamp'], requestId: json['request_id']);
   }
 }

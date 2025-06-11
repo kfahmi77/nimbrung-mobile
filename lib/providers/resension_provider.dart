@@ -1,29 +1,46 @@
-// providers/reading_review_provider.dart
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
-import 'package:nimbrung_mobile/core/constants/api_constant.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/services/resension_service.dart';
-import '../models/resension_model.dart';
+import '../core/constants/api_constant.dart';
+import '../data/datasources/resension_remote_data_source.dart';
+import '../domain/entities/resension.dart';
+import '../domain/repositories/resension_repository_impl.dart';
+import '../domain/usecases/get_resension.dart';
 
 final dioProvider = Provider<Dio>((ref) {
   return Dio(
     BaseOptions(
       baseUrl: ApiConstant.baseUrl,
-      connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 5),
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      sendTimeout: const Duration(seconds: 10),
     ),
   );
 });
 
-final readingReviewServiceProvider = Provider<ReadingReviewService>((ref) {
-  final dio = ref.watch(dioProvider);
-  return ReadingReviewService(dio);
+final readingReviewRemoteDataSourceProvider =
+    Provider<ReadingReviewRemoteDataSource>((ref) {
+      final dio = ref.watch(dioProvider);
+      return ReadingReviewRemoteDataSourceImpl(dio);
+    });
+
+final readingReviewRepositoryProvider = Provider<ReadingReviewRepositoryImpl>((
+  ref,
+) {
+  final remoteDataSource = ref.watch(readingReviewRemoteDataSourceProvider);
+  return ReadingReviewRepositoryImpl(remoteDataSource);
 });
 
-// providers/reading_review_provider.dart
-final readingReviewsProvider =
-    FutureProvider.autoDispose<ReadingReviewResponse>((ref) async {
-      final service = ref.watch(readingReviewServiceProvider);
-      return service.getReadingReviews();
-    });
+final getReadingReviewsUseCaseProvider = Provider<GetReadingReviews>((ref) {
+  final repository = ref.watch(readingReviewRepositoryProvider);
+  return GetReadingReviews(repository);
+});
+
+final readingReviewsProvider = FutureProvider.autoDispose<List<ReadingReview>>((
+  ref,
+) async {
+  final useCase = ref.watch(getReadingReviewsUseCaseProvider);
+  final result = await useCase();
+
+  return result.fold((failure) => throw failure, (reviews) => reviews);
+});

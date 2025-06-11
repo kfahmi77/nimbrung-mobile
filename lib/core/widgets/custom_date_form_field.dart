@@ -12,7 +12,7 @@ class CustomDateField extends StatelessWidget {
   final DateTime? lastDate;
 
   const CustomDateField({
-    Key? key,
+    super.key,
     required this.label,
     required this.hintText,
     required this.controller,
@@ -20,7 +20,7 @@ class CustomDateField extends StatelessWidget {
     this.onDateSelected,
     this.firstDate,
     this.lastDate,
-  }) : super(key: key);
+  });
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
