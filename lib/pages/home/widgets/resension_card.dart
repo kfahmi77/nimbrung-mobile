@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
-import '../../../core/errors/failures.dart';
 import '../../../core/utils/logger.dart';
+import '../../../core/widgets/custom_error.dart';
 import '../../../domain/entities/resension.dart';
 import '../../../providers/resension_provider.dart';
 import '../../../themes/color_schemes.dart';
@@ -56,7 +56,7 @@ class _ResensionCardState extends ConsumerState<ResensionCard> {
                 stackTrace: stackTrace,
               );
 
-              return _buildErrorWidget(error);
+              return ErrorWidgetDisplay(error: error);
             },
             data: (reviews) {
               AppLogger.info(
@@ -70,67 +70,6 @@ class _ResensionCardState extends ConsumerState<ResensionCard> {
 
               return _buildReviewsList(reviews);
             },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorWidget(Object error) {
-    String errorMessage = 'Terjadi kesalahan';
-    String errorDetails = '';
-
-    if (error is Failure) {
-      switch (error.runtimeType) {
-        case const (NetworkFailure):
-          errorMessage = 'Tidak ada koneksi internet';
-          errorDetails = 'Periksa koneksi internet Anda dan coba lagi.';
-          break;
-        case const (ServerFailure):
-          errorMessage = 'Server bermasalah';
-          errorDetails = error.message;
-          break;
-        case const (ClientFailure):
-          errorMessage = 'Kesalahan akses';
-          errorDetails = error.message;
-          break;
-        default:
-          errorMessage = 'Terjadi kesalahan';
-          errorDetails = error.message;
-      }
-    }
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 48, color: Colors.red[400]),
-          16.height,
-          Text(
-            errorMessage,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          8.height,
-          Text(
-            errorDetails,
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-            textAlign: TextAlign.center,
-          ),
-          16.height,
-          ElevatedButton(
-            onPressed: () {
-              AppLogger.info(
-                'Refreshing reading reviews',
-                tag: 'ResensionCard',
-              );
-              ref.invalidate(readingReviewsProvider);
-            },
-            child: const Text('Coba Lagi'),
           ),
         ],
       ),
