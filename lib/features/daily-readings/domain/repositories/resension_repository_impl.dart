@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 
-import '../../core/errors/exceptions.dart';
-import '../../core/errors/failures.dart';
-import '../../core/utils/logger.dart';
+import '../../../../core/errors/exceptions.dart';
+import '../../../../core/errors/failures.dart';
+import '../../../../core/utils/logger.dart';
 import '../../data/datasources/resension_remote_data_source.dart';
 import '../entities/resension.dart';
 import 'resension_repository.dart';

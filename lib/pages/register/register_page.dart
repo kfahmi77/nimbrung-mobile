@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
-import 'package:nimbrung_mobile/themes/color_schemes.dart';
+import 'package:nimbrung_mobile/core/themes/color_schemes.dart';
 
 import '../../core/widgets/buttons/custom_google_button.dart';
 import '../../core/widgets/buttons/custom_primary_button.dart';

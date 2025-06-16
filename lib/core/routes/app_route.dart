@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 
-import '../../pages/home/home_page.dart';
+import '../../features/daily-readings/presentation/screens/home_page.dart';
 import '../../pages/login/login_page.dart';
 import '../../pages/register/register_page.dart';
 import '../../pages/register_update/register_update_page.dart';

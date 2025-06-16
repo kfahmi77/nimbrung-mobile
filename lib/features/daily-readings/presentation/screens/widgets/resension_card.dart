@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
-import '../../../core/utils/logger.dart';
-import '../../../core/widgets/custom_error.dart';
+import '../../../../../core/utils/logger.dart';
+import '../../../../../core/widgets/custom_error.dart';
 import '../../../domain/entities/resension.dart';
-import '../../../providers/resension_provider.dart';
-import '../../../themes/color_schemes.dart';
+import '../../providers/resension_provider.dart';
+import '../../../../../core/themes/color_schemes.dart';
 
 class ResensionCard extends ConsumerStatefulWidget {
   const ResensionCard({super.key});

@@ -1,6 +1,6 @@
-import '../core/models/api_error.dart';
-import '../core/models/base_response.dart';
-import '../core/models/meta.dart';
+import '../../../core/models/api_error.dart';
+import '../../../core/models/base_response.dart';
+import '../../../core/models/meta.dart';
 import '../domain/entities/resension.dart';
 
 class ReadingReviewModel extends ReadingReview {

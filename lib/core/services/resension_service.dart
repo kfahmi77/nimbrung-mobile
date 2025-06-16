@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:nimbrung_mobile/core/constants/api_constant.dart';
 
-import '../../models/resension_model.dart';
+import '../../features/daily-readings/models/resension_model.dart';
 
 class ReadingReviewService {
   final Dio _dio;

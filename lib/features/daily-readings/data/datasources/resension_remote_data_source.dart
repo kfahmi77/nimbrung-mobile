@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:nimbrung_mobile/core/constants/api_constant.dart';
 
-import '../../core/errors/exceptions.dart';
-import '../../core/utils/logger.dart';
+import '../../../../core/errors/exceptions.dart';
+import '../../../../core/utils/logger.dart';
 import '../../models/resension_model.dart';
 
 abstract class ReadingReviewRemoteDataSource {

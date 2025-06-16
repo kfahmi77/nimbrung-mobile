@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/core/widgets/chat_bot_avatar.dart';
-import 'package:nimbrung_mobile/themes/color_schemes.dart';
+import 'package:nimbrung_mobile/core/themes/color_schemes.dart';
 
-import '../../core/widgets/bottom_navigation_bar.dart';
+import '../../../../core/widgets/bottom_navigation_bar.dart';
 import 'widgets/appbar.dart';
 import 'widgets/resension_card.dart';
 

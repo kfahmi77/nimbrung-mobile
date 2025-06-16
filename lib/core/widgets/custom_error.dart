@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../providers/resension_provider.dart';
+import '../../features/daily-readings/presentation/providers/resension_provider.dart';
 import '../errors/failures.dart';
 import '../utils/logger.dart';
 

@@ -4,7 +4,7 @@ import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/core/widgets/custom_date_form_field.dart';
 import 'package:nimbrung_mobile/core/widgets/custom_drop_down_field.dart';
 import 'package:nimbrung_mobile/core/widgets/profile_photo_picker.dart';
-import 'package:nimbrung_mobile/themes/color_schemes.dart';
+import 'package:nimbrung_mobile/core/themes/color_schemes.dart';
 
 import '../../core/widgets/custom_text_field.dart';
 

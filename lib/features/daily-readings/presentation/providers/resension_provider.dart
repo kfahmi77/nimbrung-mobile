@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/constants/api_constant.dart';
-import '../data/datasources/resension_remote_data_source.dart';
-import '../domain/entities/resension.dart';
-import '../domain/repositories/resension_repository_impl.dart';
-import '../domain/usecases/get_resension.dart';
+import '../../../../core/constants/api_constant.dart';
+import '../../data/datasources/resension_remote_data_source.dart';
+import '../../domain/entities/resension.dart';
+import '../../domain/repositories/resension_repository_impl.dart';
+import '../../domain/usecases/get_resension.dart';
 
 final dioProvider = Provider<Dio>((ref) {
   return Dio(
