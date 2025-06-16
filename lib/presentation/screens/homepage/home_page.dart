@@ -153,10 +153,14 @@ class HomePage extends StatelessWidget {
 
             // Book Resension Section
             ResensionCard(),
+            48.height,
           ],
         ),
       ),
-      floatingActionButton: ChatBotAvatar(),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 72),
+        child: ChatBotAvatar(),
+      ),
     );
   }
 }

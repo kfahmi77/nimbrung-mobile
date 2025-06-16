@@ -12,6 +12,7 @@ class MainScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      extendBody: true, // Tambahkan ini
       body: navigationShell,
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(bottom: 24, right: 58, left: 58),
