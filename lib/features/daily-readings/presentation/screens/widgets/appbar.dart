@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
-import '../../../../../core/themes/color_schemes.dart';
+import '../../../../../presentation/themes/color_schemes.dart';
 
 class AppbarWidget extends StatelessWidget {
   const AppbarWidget({super.key});

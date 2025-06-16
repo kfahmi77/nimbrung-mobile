@@ -1,34 +1,30 @@
-// refactored_register_page.dart
+// refactored_login_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
-import 'package:nimbrung_mobile/core/themes/color_schemes.dart';
+import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 
-import '../../core/widgets/buttons/custom_google_button.dart';
-import '../../core/widgets/buttons/custom_primary_button.dart';
-import '../../core/widgets/custom_drop_down_field.dart';
-import '../../core/widgets/custom_password_field.dart';
-import '../../core/widgets/custom_text_field.dart';
+import '../widgets/buttons/custom_google_button.dart';
+import '../widgets/buttons/custom_primary_button.dart';
+import '../widgets/custom_password_field.dart';
+import '../widgets/custom_text_field.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
-  final _usernameController = TextEditingController();
+class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  String? _selectedGender;
-  final List<String> _genders = ['Laki-laki', 'Perempuan'];
-
   @override
   void dispose() {
-    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -81,7 +77,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Daftar Dulu',
+                              'Masuk Yuk!',
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
@@ -89,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             Text(
-                              'Biar Ngerasain Serunya Nimbrung!',
+                              'Kita Nimbrung Didalem',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: AppColors.secondary,
@@ -102,7 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         bottom: -1,
                         right: 18,
                         child: SvgPicture.asset(
-                          'assets/images/register-page-image.svg',
+                          'assets/images/login-page-image.svg',
                           width: 120,
                           height: 118,
                           fit: BoxFit.contain,
@@ -119,24 +115,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       20.height,
-
-                      // Username Field
-                      CustomTextField(
-                        label: 'Username',
-                        hintText: 'Masukan username',
-                        controller: _usernameController,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Username tidak boleh kosong';
-                          }
-                          if (value.length < 3) {
-                            return 'Username minimal 3 karakter';
-                          }
-                          return null;
-                        },
-                      ),
-
-                      14.height,
 
                       // Email Field
                       CustomTextField(
@@ -159,22 +137,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       14.height,
 
-                      // Gender Dropdown
-                      CustomDropdownField<String>(
-                        label: 'Jenis Kelamin',
-                        hintText: 'Pilih jenis kelamin',
-                        value: _selectedGender,
-                        items: _genders,
-                        itemLabel: (gender) => gender,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedGender = newValue;
-                          });
-                        },
-                      ),
-
-                      14.height,
-
                       // Password Field
                       CustomPasswordField(
                         label: 'Sandi',
@@ -191,48 +153,43 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                       ),
 
-                      28.height,
+                      14.height,
 
-                      // Register Button
+                      // Forgot Password Link
+                      const Text(
+                        'Lupa sandi?',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      14.height,
+
+                      // Login Button
                       CustomPrimaryButton(
-                        text: 'Daftar',
+                        text: 'Masuk',
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            if (_selectedGender == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Silakan pilih jenis kelamin'),
-                                ),
-                              );
-                              return;
-                            }
-                            // Handle registration logic
-                            print('Username: ${_usernameController.text}');
-                            print('Email: ${_emailController.text}');
-                            print('Gender: $_selectedGender');
-                            print('Password: ${_passwordController.text}');
+                            context.pushReplacementNamed(RouteNames.home);
                           }
                         },
                       ),
-
                       24.height,
-
-                      // Google Register Button
+                      // Google Login Button
                       const CustomGoogleButton(text: 'Masuk dengan Google'),
-
                       30.height,
-
-                      // Login Link
+                      // Register Link
                       Center(
                         child: GestureDetector(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () => context.pushNamed(RouteNames.register),
                           child: RichText(
                             text: TextSpan(
-                              text: 'Sudah punya akun? ',
+                              text: 'Belum punya akun? ',
                               style: TextStyle(fontWeight: FontWeight.bold),
                               children: <TextSpan>[
                                 TextSpan(
-                                  text: 'masuk disini',
+                                  text: 'Daftar disini',
                                   style: TextStyle(
                                     color: AppColors.primary,
                                     fontWeight: FontWeight.bold,

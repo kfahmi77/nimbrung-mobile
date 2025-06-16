@@ -1,9 +1,9 @@
 import 'package:go_router/go_router.dart';
 
-import '../../features/daily-readings/presentation/screens/home_page.dart';
-import '../../pages/login/login_page.dart';
-import '../../pages/register/register_page.dart';
-import '../../pages/register_update/register_update_page.dart';
+import '../screens/homepage/home_page.dart';
+import '../screens/login/login_page.dart';
+import '../screens/register/register_page.dart';
+import '../screens/register_update/register_update_page.dart';
 import 'route_name.dart';
 
 final GoRouter appRouter = GoRouter(
