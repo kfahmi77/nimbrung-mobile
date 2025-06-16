@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../features/daily-readings/presentation/providers/resension_provider.dart';
-import '../../../core/errors/failures.dart';
-import '../../../core/utils/logger.dart';
+import '../../features/daily-readings/presentation/providers/resension_provider.dart';
+import '../../core/errors/failures.dart';
+import '../../core/utils/logger.dart';
 
 class ErrorWidgetDisplay extends ConsumerStatefulWidget {
   final Object error;

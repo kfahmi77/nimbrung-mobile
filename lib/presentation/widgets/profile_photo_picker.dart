@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../themes/color_schemes.dart';
+import '../themes/color_schemes.dart';
 
 class ProfilePhotoPicker extends StatelessWidget {
   final String label;

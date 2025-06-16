@@ -4,11 +4,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 
-import '../widgets/buttons/custom_google_button.dart';
-import '../widgets/buttons/custom_primary_button.dart';
-import '../widgets/custom_drop_down_field.dart';
-import '../widgets/custom_password_field.dart';
-import '../widgets/custom_text_field.dart';
+import '../../widgets/buttons/custom_google_button.dart';
+import '../../widgets/buttons/custom_primary_button.dart';
+import '../../widgets/custom_drop_down_field.dart';
+import '../../widgets/custom_password_field.dart';
+import '../../widgets/custom_text_field.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

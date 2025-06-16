@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../themes/color_schemes.dart';
+import '../themes/color_schemes.dart';
 
 class ChatBotAvatar extends StatelessWidget {
   const ChatBotAvatar({super.key});

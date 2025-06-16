@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
-import 'package:nimbrung_mobile/presentation/screens/widgets/chat_bot_avatar.dart';
-import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 
-import '../widgets/bottom_navigation_bar.dart';
+import '../../themes/color_schemes.dart';
 import '../../../features/daily-readings/presentation/screens/widgets/appbar.dart';
 import '../../../features/daily-readings/presentation/screens/widgets/resension_card.dart';
+import '../../widgets/chat_bot_avatar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -158,8 +157,6 @@ class HomePage extends StatelessWidget {
         ),
       ),
       floatingActionButton: ChatBotAvatar(),
-      // Bottom Navigation
-      bottomNavigationBar: BottomNavigationBarWidget(),
     );
   }
 }

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
-import 'package:nimbrung_mobile/presentation/screens/widgets/custom_date_form_field.dart';
-import 'package:nimbrung_mobile/presentation/screens/widgets/custom_drop_down_field.dart';
-import 'package:nimbrung_mobile/presentation/screens/widgets/profile_photo_picker.dart';
+import 'package:nimbrung_mobile/presentation/widgets/custom_date_form_field.dart';
+import 'package:nimbrung_mobile/presentation/widgets/custom_drop_down_field.dart';
+import 'package:nimbrung_mobile/presentation/widgets/profile_photo_picker.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 
-import '../widgets/custom_text_field.dart';
+import '../../widgets/custom_text_field.dart';
 
 class RegisterUpdatePage extends StatefulWidget {
   const RegisterUpdatePage({super.key});
