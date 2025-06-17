@@ -7,7 +7,7 @@ import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import '../../routes/route_name.dart';
 import '../../themes/color_schemes.dart';
 import '../../../features/daily-readings/presentation/screens/widgets/appbar.dart';
-import '../../../features/daily-readings/presentation/screens/widgets/resension_card.dart';
+import '../../../features/daily-readings/presentation/screens/widgets/resension.dart';
 import '../../widgets/chat_bot_avatar.dart';
 
 class HomePage extends StatelessWidget {

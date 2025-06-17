@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nimbrung_mobile/features/daily-readings/presentation/screens/resension_detail_page.dart';
 import 'package:nimbrung_mobile/presentation/screens/homepage/discussion_room_page.dart';
 
 import '../screens/favorite/favorite_page.dart';
@@ -13,6 +15,9 @@ import 'route_name.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
+  debugLogDiagnostics: true, // Selalu enable untuk debugging
+  // Tambahkan ini untuk memaksa URL sync
+  routerNeglect: false,
   routes: [
     GoRoute(
       path: '/',
@@ -29,13 +34,35 @@ final GoRouter appRouter = GoRouter(
       name: RouteNames.registerUpdate,
       builder: (context, state) => const RegisterUpdatePage(),
     ),
+
+    // Routes yang ingin tampil fullscreen (tanpa bottom navigation)
+    GoRoute(
+      path: '/detail-reading/:reviewId',
+      name: RouteNames.detailReading,
+      builder: (context, state) {
+        final reviewId = state.pathParameters['reviewId']!;
+        // Debug print
+        if (kDebugMode) {
+          print('Navigating to detail reading with reviewId: $reviewId');
+          print('Current location: ${state.uri}');
+        }
+        return const ReadingReviewDetailScreen();
+      },
+    ),
     GoRoute(
       path: '/discussion-room',
       name: RouteNames.discussionRoom,
-      builder: (context, state) => DiscussionPage(),
+      builder: (context, state) {
+        // Debug print
+        if (kDebugMode) {
+          print('Navigating to discussion room');
+          print('Current location: ${state.uri}');
+        }
+        return const DiscussionPage();
+      },
     ),
 
-    // StatefulShellRoute untuk bottom navigation
+    // StatefulShellRoute for bottom navigation
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainScreen(navigationShell: navigationShell);
@@ -46,7 +73,13 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: '/home',
               name: RouteNames.home,
-              builder: (context, state) => const HomePage(),
+              builder: (context, state) {
+                if (kDebugMode) {
+                  print('Building HomePage');
+                  print('Current location: ${state.uri}');
+                }
+                return const HomePage();
+              },
             ),
           ],
         ),
@@ -68,7 +101,6 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
-
         StatefulShellBranch(
           routes: [
             GoRoute(

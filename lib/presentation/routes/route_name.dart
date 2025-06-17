@@ -9,4 +9,5 @@ class RouteNames {
   static const String notification = 'notification';
   static const String profile = 'profile';
   static const String discussionRoom = 'discussion-room';
+  static const String detailReading = 'detail-reading';
 }

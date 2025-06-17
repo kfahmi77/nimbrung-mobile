@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
 import '../../../../../core/utils/logger.dart';
+import '../../../../../presentation/routes/route_name.dart';
 import '../../../../../presentation/widgets/custom_error.dart';
 import '../../../domain/entities/resension.dart';
+import '../../providers/detail_resension.dart';
 import '../../providers/resension_provider.dart';
 import '../../../../../presentation/themes/color_schemes.dart';
 
@@ -34,13 +37,31 @@ class _ResensionCardState extends ConsumerState<ResensionCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Resensi Buku',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Resensi Buku',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Navigate to all reviews page if needed
+                  _navigateToAllReviews();
+                },
+                child: Text(
+                  'Lihat Semua',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
           ),
           16.height,
           readingReviewsAsync.when(
@@ -91,7 +112,7 @@ class _ResensionCardState extends ConsumerState<ResensionCard> {
             },
             itemBuilder: (context, index) {
               final review = reviews[index];
-              return _buildReviewCard(review);
+              return _buildReviewCard(review, reviews);
             },
           ),
         ),
@@ -101,27 +122,33 @@ class _ResensionCardState extends ConsumerState<ResensionCard> {
     );
   }
 
-  Widget _buildReviewCard(ReadingReview review) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.secondary.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildBookCover(review.coverImageUrl),
-          _buildBookDetails(review),
-        ],
+  Widget _buildReviewCard(
+    ReadingReview review,
+    List<ReadingReview> allReviews,
+  ) {
+    return GestureDetector(
+      onTap: () => _navigateToReviewDetail(review, allReviews),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.secondary.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildBookCover(review.coverImageUrl),
+            _buildBookDetails(review),
+          ],
+        ),
       ),
     );
   }
@@ -190,6 +217,25 @@ class _ResensionCardState extends ConsumerState<ResensionCard> {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.justify,
             ),
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Baca Selengkapnya',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 12,
+                  color: AppColors.primary,
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -215,5 +261,25 @@ class _ResensionCardState extends ConsumerState<ResensionCard> {
         ),
       ),
     );
+  }
+
+  void _navigateToReviewDetail(
+    ReadingReview review,
+    List<ReadingReview> allReviews,
+  ) {
+    // Store the data in a provider or pass via extra
+    ref.read(selectedReviewProvider.notifier).setReviewData(review, allReviews);
+
+    context.pushNamed(
+      RouteNames.detailReading,
+      pathParameters: {'reviewId': review.id.toString()},
+    );
+  }
+
+  void _navigateToAllReviews() {
+    // Implement navigation to all reviews page
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Navigasi ke semua resensi')));
   }
 }

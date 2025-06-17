@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 
 import '../../../features/discussions/comment.dart';
@@ -126,7 +128,7 @@ class _DiscussionPageState extends State<DiscussionPage>
     return AppBar(
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () => context.pop(RouteNames.home),
       ),
       centerTitle: true,
       title: Column(
