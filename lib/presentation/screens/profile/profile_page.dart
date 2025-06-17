@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 
@@ -69,27 +70,32 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Enhanced background with parallax effect
-          _buildParallaxBackground(),
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.light.copyWith(
+          statusBarColor: Colors.transparent,
+        ),
+        child: Stack(
+          children: [
+            // Enhanced background with parallax effect
+            _buildParallaxBackground(),
 
-          // Animated floating settings button
-          _buildFloatingSettingsButton(),
+            // Animated floating settings button
+            _buildFloatingSettingsButton(),
 
-          // Main scrollable content
-          _buildScrollableContent(),
+            // Main scrollable content
+            _buildScrollableContent(),
 
-          // Animated profile picture with glow effect
-          _buildAnimatedProfilePicture(),
-        ],
+            // Animated profile picture with glow effect
+            _buildAnimatedProfilePicture(),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildParallaxBackground() {
     return Positioned(
-      top: -(_scrollOffset * 0.5), // Parallax effect
+      top: -(_scrollOffset * 0.001), // Parallax effect
       left: 0,
       right: 0,
       child: Container(
@@ -154,7 +160,7 @@ class _ProfilePageState extends State<ProfilePage>
   Widget _buildScrollableContent() {
     return CustomScrollView(
       controller: _scrollController,
-      physics: const BouncingScrollPhysics(),
+      physics: ClampingScrollPhysics(),
       slivers: [
         // Flexible space for background
         SliverToBoxAdapter(child: SizedBox(height: 180)),
@@ -428,7 +434,7 @@ class _ProfilePageState extends State<ProfilePage>
                   Row(
                     children: [
                       Text(
-                        'Karya Tulis',
+                        'Karya Tulis Terbaru',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

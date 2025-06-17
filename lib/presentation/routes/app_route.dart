@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:nimbrung_mobile/presentation/screens/homepage/discussion_room_page.dart';
 
 import '../screens/favorite/favorite_page.dart';
 import '../screens/homepage/home_page.dart';
@@ -27,6 +28,11 @@ final GoRouter appRouter = GoRouter(
       path: '/register-update',
       name: RouteNames.registerUpdate,
       builder: (context, state) => const RegisterUpdatePage(),
+    ),
+    GoRoute(
+      path: '/discussion-room',
+      name: RouteNames.discussionRoom,
+      builder: (context, state) => DiscussionPage(),
     ),
 
     // StatefulShellRoute untuk bottom navigation
