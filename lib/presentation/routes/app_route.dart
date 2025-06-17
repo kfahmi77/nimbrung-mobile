@@ -88,7 +88,7 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: '/search',
               name: RouteNames.search,
-              builder: (context, state) => const SearchPage(),
+              builder: (context, state) => const SearchFriendsPage(),
             ),
           ],
         ),

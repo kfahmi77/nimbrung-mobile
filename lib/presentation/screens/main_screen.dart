@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../providers/visibility_provider.dart';
 import '../themes/color_schemes.dart';
 
 class MainScreen extends ConsumerWidget {
@@ -11,48 +12,53 @@ class MainScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isVisible = ref.watch(bottomNavVisibilityProvider);
+
     return Scaffold(
-      extendBody: true, // Tambahkan ini
+      extendBody: true,
       body: navigationShell,
-      bottomNavigationBar: Container(
-        margin: const EdgeInsets.only(bottom: 24, right: 58, left: 58),
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _NavItem(
-                icon: Icons.home_rounded,
-                index: 0,
-                selectedIndex: navigationShell.currentIndex,
-                onTap: () => _onTap(navigationShell, 0),
-              ),
-              _NavItem(
-                icon: Icons.search,
-                index: 1,
-                selectedIndex: navigationShell.currentIndex,
-                onTap: () => _onTap(navigationShell, 1),
-              ),
-              _NavItem(
-                icon: Icons.menu_book,
-                index: 2,
-                selectedIndex: navigationShell.currentIndex,
-                onTap: () => _onTap(navigationShell, 2),
-              ),
-              _NavItem(
-                icon: Icons.person,
-                index: 3,
-                selectedIndex: navigationShell.currentIndex,
-                onTap: () => _onTap(navigationShell, 3),
-              ),
-            ],
-          ),
-        ),
-      ),
+      bottomNavigationBar:
+          isVisible
+              ? Container(
+                margin: const EdgeInsets.only(bottom: 24, right: 58, left: 58),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _NavItem(
+                        icon: Icons.home_rounded,
+                        index: 0,
+                        selectedIndex: navigationShell.currentIndex,
+                        onTap: () => _onTap(navigationShell, 0),
+                      ),
+                      _NavItem(
+                        icon: Icons.search,
+                        index: 1,
+                        selectedIndex: navigationShell.currentIndex,
+                        onTap: () => _onTap(navigationShell, 1),
+                      ),
+                      _NavItem(
+                        icon: Icons.menu_book,
+                        index: 2,
+                        selectedIndex: navigationShell.currentIndex,
+                        onTap: () => _onTap(navigationShell, 2),
+                      ),
+                      _NavItem(
+                        icon: Icons.person,
+                        index: 3,
+                        selectedIndex: navigationShell.currentIndex,
+                        onTap: () => _onTap(navigationShell, 3),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+              : null,
     );
   }
 
