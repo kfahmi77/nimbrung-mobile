@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
+import 'package:nimbrung_mobile/presentation/extension/snackbar_extension.dart';
 
 import '../../../../../core/utils/logger.dart';
-import '../../../../../presentation/widgets/custom_error.dart';
 import '../../../../../presentation/themes/color_schemes.dart';
+import '../../../../presentation/widgets/custom_snackbar.dart';
 import '../../domain/entities/resension.dart';
 import '../providers/detail_resension.dart';
 
@@ -80,7 +81,11 @@ class _ReadingReviewDetailScreenState
       ),
       title: const Text(
         'Resensi Buku',
-        style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600),
+        style: TextStyle(
+          color: Colors.black87,
+          fontWeight: FontWeight.bold,
+          fontSize: 24,
+        ),
       ),
       actions: [
         IconButton(
@@ -291,7 +296,11 @@ class _ReadingReviewDetailScreenState
               _buildActionButton(
                 Icons.thumb_up_outlined,
                 'Suka',
-                () => _likeReview(),
+                () => context.showCustomSnackbar(
+                  message: 'Anda menyukai bacaan ini',
+
+                  type: SnackbarType.warning,
+                ),
               ),
               12.width,
               _buildActionButton(
@@ -476,13 +485,6 @@ class _ReadingReviewDetailScreenState
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
-  }
-
-  void _likeReview() {
-    // Implement like functionality
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Resensi disukai!')));
   }
 
   void _shareReview() {

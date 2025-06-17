@@ -72,7 +72,7 @@ class _DiscussionPageState extends State<DiscussionPage>
       vsync: this,
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+      CurvedAnimation(parent: _animationController, curve: Curves.bounceIn),
     );
     _animationController.forward();
 
@@ -130,8 +130,9 @@ class _DiscussionPageState extends State<DiscussionPage>
         icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
         onPressed: () => context.pop(RouteNames.home),
       ),
-      centerTitle: true,
+
       title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Ruang Nimbrung',
@@ -296,6 +297,7 @@ class _DiscussionPageState extends State<DiscussionPage>
             width: 80,
             height: 30,
             child: Stack(
+              clipBehavior: Clip.none,
               children: [
                 _buildUserAvatar(
                   'https://randomuser.me/api/portraits/women/5.jpg',
