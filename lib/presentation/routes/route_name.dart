@@ -5,7 +5,7 @@ class RouteNames {
   static const String register = 'register';
   static const String registerUpdate = 'register-update';
   static const String search = 'search';
-  static const String favorite = 'favorite';
+  static const String library = 'library';
   static const String notification = 'notification';
   static const String profile = 'profile';
   static const String discussionRoom = 'discussion-room';

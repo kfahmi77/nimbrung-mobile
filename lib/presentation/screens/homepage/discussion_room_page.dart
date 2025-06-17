@@ -133,12 +133,12 @@ class _DiscussionPageState extends State<DiscussionPage>
       centerTitle: true,
       title: Column(
         children: [
-          const Text(
+          Text(
             'Ruang Nimbrung',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 24,
             ),
           ),
           Text(

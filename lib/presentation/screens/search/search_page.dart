@@ -147,13 +147,12 @@ class _SearchFriendsPageState extends State<SearchFriendsPage>
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-
-        title: const Text(
+        title: Text(
           "Cari Teman",
           style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
+            color: Theme.of(context).primaryColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
           ),
         ),
         centerTitle: true,

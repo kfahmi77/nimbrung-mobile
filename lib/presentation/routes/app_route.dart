@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/features/daily-readings/presentation/screens/resension_detail_page.dart';
 import 'package:nimbrung_mobile/presentation/screens/homepage/discussion_room_page.dart';
 
-import '../screens/favorite/favorite_page.dart';
+import '../screens/library/library_page.dart';
 import '../screens/homepage/home_page.dart';
 import '../screens/login/login_page.dart';
 import '../screens/main_screen.dart';
@@ -95,9 +95,9 @@ final GoRouter appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/favorite',
-              name: RouteNames.favorite,
-              builder: (context, state) => const FavoritesPage(),
+              path: '/library',
+              name: RouteNames.library,
+              builder: (context, state) => const LibraryPage(),
             ),
           ],
         ),
