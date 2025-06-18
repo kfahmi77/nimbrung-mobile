@@ -16,11 +16,16 @@ class DiscussionPage extends StatefulWidget {
 class _DiscussionPageState extends State<DiscussionPage>
     with SingleTickerProviderStateMixin {
   final TextEditingController _messageController = TextEditingController();
+  final TextEditingController _replyController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   bool _isTyping = false;
   bool _showScrollToBottom = false;
+  final FocusNode _replyFocusNode = FocusNode();
+
+  // Track which comments have expanded replies
+  final Set<int> _expandedComments = <int>{};
 
   // Enhanced dummy list of comments with more variety
   final List<Comment> _comments = [
@@ -32,7 +37,50 @@ class _DiscussionPageState extends State<DiscussionPage>
           'Topik kognisi ini sangat relevan dengan penelitian terbaru di bidang neurosains. Ada beberapa studi menarik yang menunjukkan bagaimana proses kognitif dapat dioptimalkan melalui latihan mindfulness.',
       isExpert: true,
       likesCount: 12,
-      repliesCount: 3,
+      repliesCount: 10,
+      replies: [
+        Comment(
+          userName: 'Sarah Chen',
+          userImageUrl: 'https://randomuser.me/api/portraits/women/8.jpg',
+          timeAgo: '1 jam yang lalu',
+          text: 'Sangat menarik! Apakah ada link ke penelitian tersebut?',
+          likesCount: 2,
+        ),
+        Comment(
+          userName: 'Ahmad Rizki',
+          userImageUrl: 'https://randomuser.me/api/portraits/men/9.jpg',
+          timeAgo: '45 menit yang lalu',
+          text:
+              'Saya setuju dengan pendapat Dr. Johannes. Mindfulness memang terbukti efektif.',
+          likesCount: 1,
+        ),
+        Comment(
+          userName: 'Dr. Johannes Falk',
+          userImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
+          timeAgo: '40 menit yang lalu',
+          text:
+              '@Sarah Chen Tentu! Saya akan share link studinya di grup nanti.',
+          isExpert: true,
+          likesCount: 3,
+        ),
+        Comment(
+          userName: 'Rina Sari',
+          userImageUrl: 'https://randomuser.me/api/portraits/women/11.jpg',
+          timeAgo: '35 menit yang lalu',
+          text:
+              'Apakah teknik mindfulness bisa diterapkan untuk anak-anak juga?',
+          likesCount: 0,
+        ),
+        Comment(
+          userName: 'Prof. Maria Santos',
+          userImageUrl: 'https://randomuser.me/api/portraits/women/12.jpg',
+          timeAgo: '20 menit yang lalu',
+          text:
+              'Ada beberapa penelitian tentang mindfulness untuk anak. Sangat promising!',
+          isExpert: true,
+          likesCount: 4,
+        ),
+      ],
     ),
     Comment(
       userName: 'Birgitta Mattsson',
@@ -41,7 +89,32 @@ class _DiscussionPageState extends State<DiscussionPage>
       text:
           'Setuju! Saya juga pernah membaca tentang dual-process theory. Menarik bagaimana otak kita memproses informasi secara otomatis dan terkontrol.',
       likesCount: 8,
-      repliesCount: 1,
+      repliesCount: 3,
+      replies: [
+        Comment(
+          userName: 'Budi Santoso',
+          userImageUrl: 'https://randomuser.me/api/portraits/men/10.jpg',
+          timeAgo: '30 menit yang lalu',
+          text: 'Bisa dijelaskan lebih detail tentang dual-process theory?',
+          likesCount: 0,
+        ),
+        Comment(
+          userName: 'Birgitta Mattsson',
+          userImageUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+          timeAgo: '25 menit yang lalu',
+          text:
+              '@Budi Santoso Dual-process theory menjelaskan dua sistem pemikiran: System 1 (cepat, otomatis) dan System 2 (lambat, deliberatif).',
+          likesCount: 2,
+        ),
+        Comment(
+          userName: 'David Wilson',
+          userImageUrl: 'https://randomuser.me/api/portraits/men/13.jpg',
+          timeAgo: '15 menit yang lalu',
+          text:
+              'Seperti yang dijelaskan Kahneman dalam bukunya ya. Sangat aplikatif!',
+          likesCount: 1,
+        ),
+      ],
     ),
     Comment(
       userName: 'Jessica Åberg',
@@ -50,7 +123,39 @@ class _DiscussionPageState extends State<DiscussionPage>
       text:
           'Apakah ada rekomendasi buku lain tentang cognitive psychology yang lebih mudah dipahami untuk pemula? 📚',
       likesCount: 5,
-      repliesCount: 2,
+      repliesCount: 4,
+      replies: [
+        Comment(
+          userName: 'Prof. Lovisa Wallin',
+          userImageUrl: 'https://randomuser.me/api/portraits/women/4.jpg',
+          timeAgo: '30 menit yang lalu',
+          text:
+              '"Thinking, Fast and Slow" oleh Kahneman sangat bagus untuk pemula.',
+          isExpert: true,
+          likesCount: 3,
+        ),
+        Comment(
+          userName: 'Maya Putri',
+          userImageUrl: 'https://randomuser.me/api/portraits/women/14.jpg',
+          timeAgo: '25 menit yang lalu',
+          text: 'Saya juga recommend "The Righteous Mind" oleh Jonathan Haidt!',
+          likesCount: 1,
+        ),
+        Comment(
+          userName: 'Alex Thompson',
+          userImageUrl: 'https://randomuser.me/api/portraits/men/14.jpg',
+          timeAgo: '20 menit yang lalu',
+          text: '"Predictably Irrational" oleh Dan Ariely juga mudah dipahami.',
+          likesCount: 2,
+        ),
+        Comment(
+          userName: 'Jessica Åberg',
+          userImageUrl: 'https://randomuser.me/api/portraits/women/3.jpg',
+          timeAgo: '10 menit yang lalu',
+          text: 'Terima kasih semuanya! Akan saya coba baca satu per satu 😊',
+          likesCount: 0,
+        ),
+      ],
     ),
     Comment(
       userName: 'Prof. Lovisa Wallin',
@@ -93,7 +198,9 @@ class _DiscussionPageState extends State<DiscussionPage>
   void dispose() {
     _animationController.dispose();
     _messageController.dispose();
+    _replyController.dispose();
     _scrollController.dispose();
+    _replyFocusNode.dispose();
     super.dispose();
   }
 
@@ -388,153 +495,338 @@ class _DiscussionPageState extends State<DiscussionPage>
   Widget _buildEnhancedCommentItem(Comment comment, int index) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 22,
-                    backgroundImage: NetworkImage(comment.userImageUrl),
-                  ),
-                  if (comment.isExpert == true)
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.verified,
-                          color: Colors.white,
-                          size: 12,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(width: 12.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[200]!),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
+                    Stack(
                       children: [
-                        Flexible(
-                          child: Text(
-                            comment.userName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15.0,
+                        CircleAvatar(
+                          radius: 22,
+                          backgroundImage: NetworkImage(comment.userImageUrl),
+                        ),
+                        if (comment.isExpert == true)
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.verified,
+                                color: Colors.white,
+                                size: 12,
+                              ),
                             ),
                           ),
-                        ),
-                        if (comment.isExpert == true) ...[
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.verified,
-                            color: Colors.blue,
-                            size: 16,
-                          ),
-                        ],
                       ],
                     ),
-                    Text(
-                      comment.timeAgo,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12.0),
+                    const SizedBox(width: 12.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  comment.userName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15.0,
+                                  ),
+                                ),
+                              ),
+                              if (comment.isExpert == true) ...[
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.verified,
+                                  color: Colors.blue,
+                                  size: 16,
+                                ),
+                              ],
+                            ],
+                          ),
+                          Text(
+                            comment.timeAgo,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuButton<String>(
+                      icon: Icon(Icons.more_horiz, color: Colors.grey[600]),
+                      onSelected: (value) {
+                        _handleCommentAction(value, comment);
+                      },
+                      itemBuilder:
+                          (BuildContext context) => [
+                            const PopupMenuItem(
+                              value: 'reply',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.reply, size: 18),
+                                  SizedBox(width: 8),
+                                  Text('Balas'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'report',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.flag_outlined, size: 18),
+                                  SizedBox(width: 8),
+                                  Text('Laporkan'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'block',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.block, size: 18),
+                                  SizedBox(width: 8),
+                                  Text('Blokir'),
+                                ],
+                              ),
+                            ),
+                          ],
                     ),
                   ],
                 ),
+                const SizedBox(height: 12.0),
+                Text(
+                  comment.text,
+                  style: const TextStyle(fontSize: 14.0, height: 1.4),
+                ),
+                const SizedBox(height: 12.0),
+                Row(
+                  children: [
+                    _buildInteractionButton(
+                      icon: Icons.thumb_up_outlined,
+                      count: comment.likesCount ?? 0,
+                      onTap: () => _handleLike(comment),
+                    ),
+                    const SizedBox(width: 16),
+                    _buildInteractionButton(
+                      icon: Icons.chat_bubble_outline,
+                      count: comment.repliesCount ?? 0,
+                      onTap: () => _handleReply(comment),
+                    ),
+                    const Spacer(),
+                    // View replies button (only show if there are replies)
+                    if (comment.replies != null &&
+                        comment.replies!.isNotEmpty) ...[
+                      _buildViewRepliesButton(comment, index),
+                      const SizedBox(width: 8),
+                    ],
+                    TextButton.icon(
+                      onPressed: () => _handleShare(comment),
+                      icon: const Icon(Icons.share, size: 16),
+                      label: const Text('Bagikan'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.grey[600],
+                        textStyle: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Display replies with animation
+          if (comment.replies != null &&
+              comment.replies!.isNotEmpty &&
+              _expandedComments.contains(index))
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: Column(
+                children:
+                    comment.replies!
+                        .map((reply) => _buildReplyItem(reply))
+                        .toList(),
               ),
-              PopupMenuButton<String>(
-                icon: Icon(Icons.more_horiz, color: Colors.grey[600]),
-                onSelected: (value) {
-                  _handleCommentAction(value, comment);
-                },
-                itemBuilder:
-                    (BuildContext context) => [
-                      const PopupMenuItem(
-                        value: 'reply',
-                        child: Row(
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReplyItem(Comment reply) {
+    return Container(
+      margin: const EdgeInsets.only(left: 32, top: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Thread line indicator
+          Container(
+            width: 2,
+            height: 80,
+            margin: const EdgeInsets.only(right: 12, top: 8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(1),
+            ),
+          ),
+          // Reply content
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundImage: NetworkImage(reply.userImageUrl),
+                      ),
+                      const SizedBox(width: 8.0),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.reply, size: 18),
-                            SizedBox(width: 8),
-                            Text('Balas'),
+                            Row(
+                              children: [
+                                Text(
+                                  reply.userName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13.0,
+                                  ),
+                                ),
+                                if (reply.isExpert == true) ...[
+                                  const SizedBox(width: 4),
+                                  const Icon(
+                                    Icons.verified,
+                                    color: Colors.blue,
+                                    size: 12,
+                                  ),
+                                ],
+                              ],
+                            ),
+                            Text(
+                              reply.timeAgo,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 10.0,
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
-                        value: 'report',
-                        child: Row(
-                          children: [
-                            Icon(Icons.flag_outlined, size: 18),
-                            SizedBox(width: 8),
-                            Text('Laporkan'),
-                          ],
+                      PopupMenuButton<String>(
+                        icon: Icon(
+                          Icons.more_horiz,
+                          color: Colors.grey[600],
+                          size: 16,
                         ),
+                        onSelected: (value) {
+                          _handleCommentAction(value, reply);
+                        },
+                        itemBuilder:
+                            (BuildContext context) => [
+                              const PopupMenuItem(
+                                value: 'reply',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.reply, size: 16),
+                                    SizedBox(width: 8),
+                                    Text('Balas'),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuItem(
+                                value: 'report',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.flag_outlined, size: 16),
+                                    SizedBox(width: 8),
+                                    Text('Laporkan'),
+                                  ],
+                                ),
+                              ),
+                            ],
                       ),
-                      const PopupMenuItem(
-                        value: 'block',
-                        child: Row(
-                          children: [
-                            Icon(Icons.block, size: 18),
-                            SizedBox(width: 8),
-                            Text('Blokir'),
-                          ],
+                    ],
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    reply.text,
+                    style: const TextStyle(fontSize: 13.0, height: 1.3),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Row(
+                    children: [
+                      _buildInteractionButton(
+                        icon: Icons.thumb_up_outlined,
+                        count: reply.likesCount ?? 0,
+                        onTap: () => _handleLike(reply),
+                      ),
+                      const SizedBox(width: 16),
+                      InkWell(
+                        onTap: () => _handleReply(reply),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.reply,
+                                size: 16,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Balas',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
+                  ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: 12.0),
-          Text(
-            comment.text,
-            style: const TextStyle(fontSize: 14.0, height: 1.4),
-          ),
-          const SizedBox(height: 12.0),
-          Row(
-            children: [
-              _buildInteractionButton(
-                icon: Icons.thumb_up_outlined,
-                count: comment.likesCount ?? 0,
-                onTap: () => _handleLike(comment),
-              ),
-              const SizedBox(width: 16),
-              _buildInteractionButton(
-                icon: Icons.chat_bubble_outline,
-                count: comment.repliesCount ?? 0,
-                onTap: () => _handleReply(comment),
-              ),
-              const Spacer(),
-              TextButton.icon(
-                onPressed: () => _handleShare(comment),
-                icon: const Icon(Icons.share, size: 16),
-                label: const Text('Bagikan'),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.grey[600],
-                  textStyle: const TextStyle(fontSize: 12),
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
@@ -562,6 +854,60 @@ class _DiscussionPageState extends State<DiscussionPage>
                 style: TextStyle(color: Colors.grey[600], fontSize: 12),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildViewRepliesButton(Comment comment, int commentIndex) {
+    final isExpanded = _expandedComments.contains(commentIndex);
+    final repliesCount = comment.repliesCount ?? 0;
+
+    return InkWell(
+      onTap: () {
+        setState(() {
+          if (isExpanded) {
+            _expandedComments.remove(commentIndex);
+          } else {
+            _expandedComments.add(commentIndex);
+          }
+        });
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color:
+              isExpanded
+                  ? AppColors.primary.withOpacity(0.1)
+                  : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color:
+                isExpanded
+                    ? AppColors.primary.withOpacity(0.3)
+                    : Colors.grey[300]!,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isExpanded ? Icons.expand_less : Icons.expand_more,
+              size: 16,
+              color: isExpanded ? AppColors.primary : Colors.grey[600],
+            ),
+            const SizedBox(width: 4),
+            Text(
+              isExpanded ? 'Sembunyikan' : 'Lihat $repliesCount balasan',
+              style: TextStyle(
+                color: isExpanded ? AppColors.primary : Colors.grey[600],
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ),
@@ -673,8 +1019,7 @@ class _DiscussionPageState extends State<DiscussionPage>
   }
 
   void _handleReply(Comment comment) {
-    // TODO: Implement reply functionality
-    _messageController.text = '@${comment.userName} ';
+    _showReplyBottomSheet(comment);
   }
 
   void _handleShare(Comment comment) {
@@ -693,6 +1038,251 @@ class _DiscussionPageState extends State<DiscussionPage>
       case 'block':
         _showInteractionFeedback('Pengguna diblokir 🚫');
         break;
+    }
+  }
+
+  void _showReplyBottomSheet(Comment comment) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _buildReplyBottomSheet(comment),
+    ).then((_) {
+      // Clear controller when bottom sheet is closed
+      _replyController.clear();
+    });
+
+    // Auto focus after a short delay to ensure bottom sheet is fully opened
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _replyFocusNode.requestFocus();
+    });
+  }
+
+  Widget _buildReplyBottomSheet(Comment comment) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Header
+            Row(
+              children: [
+                Icon(Icons.reply, color: AppColors.primary, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Balas Komentar',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close, color: Colors.grey[600]),
+                  constraints: const BoxConstraints(),
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Original comment preview
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundImage: NetworkImage(comment.userImageUrl),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  comment.userName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                if (comment.isExpert == true) ...[
+                                  const SizedBox(width: 4),
+                                  const Icon(
+                                    Icons.verified,
+                                    color: Colors.blue,
+                                    size: 14,
+                                  ),
+                                ],
+                              ],
+                            ),
+                            Text(
+                              comment.timeAgo,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    comment.text,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[700],
+                      height: 1.3,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Reply input field
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: TextField(
+                controller: _replyController,
+                focusNode: _replyFocusNode,
+                style: const TextStyle(fontSize: 14),
+                maxLines: null,
+                minLines: 3,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  hintText: 'Tulis balasan untuk ${comment.userName}...',
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.all(16),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Action buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      _replyController.clear();
+                      Navigator.pop(context);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: Colors.grey[300]!),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Batal',
+                      style: TextStyle(color: Colors.grey[700]),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _replyController,
+                    builder: (context, value, child) {
+                      final hasText = value.text.trim().isNotEmpty;
+                      return ElevatedButton(
+                        onPressed:
+                            hasText
+                                ? () => _sendReplyFromBottomSheet(comment)
+                                : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              hasText ? AppColors.primary : Colors.grey[400],
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.send, size: 16, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'Kirim Balasan',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _sendReplyFromBottomSheet(Comment comment) {
+    if (_replyController.text.trim().isNotEmpty) {
+      // Show feedback
+      Navigator.pop(context);
+      _showSendingFeedback();
+
+      // TODO: Implement actual reply send logic
+      // You can add the reply to the comment's replies list here
+
+      // Clear the controller
+      _replyController.clear();
     }
   }
 

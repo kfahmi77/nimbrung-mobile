@@ -40,7 +40,6 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header Section (unchanged)
                 SizedBox(
                   width: double.infinity,
                   height: 234,
