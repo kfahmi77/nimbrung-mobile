@@ -4,9 +4,9 @@ class Comment {
   final String timeAgo;
   final String text;
   final bool? isExpert;
-  final int? likesCount;
-  final int? repliesCount;
-  final bool? isLiked;
+  int? likesCount;
+  int? repliesCount;
+  bool? isLiked;
   final List<Comment>? replies;
 
   Comment({

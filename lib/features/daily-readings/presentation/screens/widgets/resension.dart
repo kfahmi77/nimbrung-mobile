@@ -77,7 +77,23 @@ class _ResensionCardState extends ConsumerState<ResensionCard> {
                 stackTrace: stackTrace,
               );
 
-              return ErrorWidgetDisplay(error: error);
+              // Option 1: Using the provider-aware widget
+              return CustomErrorWidgetWithProvider(
+                error: error,
+                provider: readingReviewsProvider,
+                logTag: 'ResensionCard',
+                customMessage: 'Gagal memuat resensi buku',
+                customDetails:
+                    'Terjadi kesalahan saat memuat daftar resensi buku.',
+              );
+
+              // Option 2: Using the helper extension (alternative)
+              // return error.toProviderErrorWidget(
+              //   provider: readingReviewsProvider,
+              //   ref: ref,
+              //   logTag: 'ResensionCard',
+              //   customMessage: 'Gagal memuat resensi buku',
+              // );
             },
             data: (reviews) {
               AppLogger.info(
