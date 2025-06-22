@@ -14,11 +14,15 @@ class MainScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isVisible = ref.watch(bottomNavVisibilityProvider);
 
+    // Check if current location is a nested route that should hide bottom nav
+    final currentLocation = GoRouterState.of(context).uri.toString();
+    final shouldHideBottomNav = _shouldHideBottomNavigation(currentLocation);
+
     return Scaffold(
       extendBody: true,
       body: navigationShell,
       bottomNavigationBar:
-          isVisible
+          (isVisible && !shouldHideBottomNav)
               ? Container(
                 margin: const EdgeInsets.only(bottom: 24, right: 58, left: 58),
                 decoration: BoxDecoration(
@@ -60,6 +64,13 @@ class MainScreen extends ConsumerWidget {
               )
               : null,
     );
+  }
+
+  bool _shouldHideBottomNavigation(String location) {
+    // Hide bottom navigation for nested routes
+    return location.contains('/home/discussion') ||
+        location.contains('/home/detail-reading') ||
+        location.contains('/standalone-');
   }
 
   void _onTap(StatefulNavigationShell shell, int index) {

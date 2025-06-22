@@ -235,7 +235,7 @@ class _DiscussionPageState extends State<DiscussionPage>
     return AppBar(
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
-        onPressed: () => context.pop(RouteNames.home),
+        onPressed: () => context.pop(),
       ),
 
       title: Column(

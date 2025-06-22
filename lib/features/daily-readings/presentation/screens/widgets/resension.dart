@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
 import '../../../../../core/utils/logger.dart';
-import '../../../../../presentation/routes/route_name.dart';
 import '../../../../../presentation/widgets/custom_error.dart';
 import '../../../domain/entities/resension.dart';
 import '../../providers/detail_resension.dart';
@@ -286,10 +285,8 @@ class _ResensionCardState extends ConsumerState<ResensionCard> {
     // Store the data in a provider or pass via extra
     ref.read(selectedReviewProvider.notifier).setReviewData(review, allReviews);
 
-    context.pushNamed(
-      RouteNames.detailReading,
-      pathParameters: {'reviewId': review.id.toString()},
-    );
+    // Use nested route path for detail reading
+    context.go('/home/detail-reading/${review.id}');
   }
 
   void _navigateToAllReviews() {

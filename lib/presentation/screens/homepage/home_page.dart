@@ -4,7 +4,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
-import '../../routes/route_name.dart';
 import '../../themes/color_schemes.dart';
 import '../../../features/daily-readings/presentation/screens/widgets/appbar.dart';
 import '../../../features/daily-readings/presentation/screens/widgets/resension.dart';
@@ -89,7 +88,8 @@ class HomePage extends StatelessWidget {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  context.pushNamed(RouteNames.discussionRoom);
+                                  // Navigate to nested discussion route
+                                  context.go('/home/discussion');
                                 },
                                 child: Container(
                                   padding: EdgeInsets.symmetric(

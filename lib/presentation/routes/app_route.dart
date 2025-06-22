@@ -14,7 +14,7 @@ import '../screens/search/search_page.dart';
 import 'route_name.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/home',
   debugLogDiagnostics: true, // Selalu enable untuk debugging
   // Tambahkan ini untuk memaksa URL sync
   routerNeglect: false,
@@ -35,39 +35,13 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const RegisterUpdatePage(),
     ),
 
-    // Routes yang ingin tampil fullscreen (tanpa bottom navigation)
-    GoRoute(
-      path: '/detail-reading/:reviewId',
-      name: RouteNames.detailReading,
-      builder: (context, state) {
-        final reviewId = state.pathParameters['reviewId']!;
-        // Debug print
-        if (kDebugMode) {
-          print('Navigating to detail reading with reviewId: $reviewId');
-          print('Current location: ${state.uri}');
-        }
-        return const ReadingReviewDetailScreen();
-      },
-    ),
-    GoRoute(
-      path: '/discussion-room',
-      name: RouteNames.discussionRoom,
-      builder: (context, state) {
-        // Debug print
-        if (kDebugMode) {
-          print('Navigating to discussion room');
-          print('Current location: ${state.uri}');
-        }
-        return const DiscussionPage();
-      },
-    ),
-
-    // StatefulShellRoute for bottom navigation
+    // StatefulShellRoute for bottom navigation with nested routes
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return MainScreen(navigationShell: navigationShell);
       },
       branches: [
+        // Home branch with nested routes
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -80,9 +54,39 @@ final GoRouter appRouter = GoRouter(
                 }
                 return const HomePage();
               },
+              routes: [
+                // Nested route for discussion room
+                GoRoute(
+                  path: 'discussion',
+                  name: RouteNames.discussionRoom,
+                  builder: (context, state) {
+                    if (kDebugMode) {
+                      print('Navigating to discussion room from home');
+                      print('Current location: ${state.uri}');
+                    }
+                    return const DiscussionPage();
+                  },
+                ),
+                // Nested route for detail reading
+                GoRoute(
+                  path: 'detail-reading/:reviewId',
+                  name: RouteNames.detailReading,
+                  builder: (context, state) {
+                    final reviewId = state.pathParameters['reviewId']!;
+                    if (kDebugMode) {
+                      print(
+                        'Navigating to detail reading with reviewId: $reviewId',
+                      );
+                      print('Current location: ${state.uri}');
+                    }
+                    return const ReadingReviewDetailScreen();
+                  },
+                ),
+              ],
             ),
           ],
         ),
+        // Search branch
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -92,6 +96,7 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
+        // Library branch
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -101,6 +106,7 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
+        // Profile branch
         StatefulShellBranch(
           routes: [
             GoRoute(
@@ -111,6 +117,33 @@ final GoRouter appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+
+    // Standalone routes (fullscreen, tanpa bottom navigation)
+    GoRoute(
+      path: '/standalone-discussion',
+      name: 'standalone-discussion',
+      builder: (context, state) {
+        if (kDebugMode) {
+          print('Navigating to standalone discussion room');
+          print('Current location: ${state.uri}');
+        }
+        return const DiscussionPage();
+      },
+    ),
+    GoRoute(
+      path: '/standalone-detail/:reviewId',
+      name: 'standalone-detail',
+      builder: (context, state) {
+        final reviewId = state.pathParameters['reviewId']!;
+        if (kDebugMode) {
+          print(
+            'Navigating to standalone detail reading with reviewId: $reviewId',
+          );
+          print('Current location: ${state.uri}');
+        }
+        return const ReadingReviewDetailScreen();
+      },
     ),
   ],
 );
