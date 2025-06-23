@@ -11,6 +11,8 @@ import '../screens/profile/profile_page.dart';
 import '../screens/register/register_page.dart';
 import '../screens/register_update/register_update_page.dart';
 import '../screens/search/search_page.dart';
+import '../screens/chat/chat_list_page.dart';
+import '../screens/chat/chat_page.dart';
 import 'route_name.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -81,6 +83,39 @@ final GoRouter appRouter = GoRouter(
                     }
                     return const ReadingReviewDetailScreen();
                   },
+                ),
+                // Nested route for chat list
+                GoRoute(
+                  path: 'chat',
+                  name: RouteNames.chatList,
+                  builder: (context, state) {
+                    if (kDebugMode) {
+                      print('Navigating to chat list from home');
+                      print('Current location: ${state.uri}');
+                    }
+                    return const ChatListPage();
+                  },
+                  routes: [
+                    GoRoute(
+                      path: ':chatId',
+                      name: RouteNames.chatDetail,
+                      builder: (context, state) {
+                        final chatId = state.pathParameters['chatId']!;
+                        final chatTitle =
+                            state.uri.queryParameters['title'] ?? 'Chat';
+                        final chatAvatar = state.uri.queryParameters['avatar'];
+                        if (kDebugMode) {
+                          print('Navigating to chat with chatId: $chatId');
+                          print('Current location: ${state.uri}');
+                        }
+                        return ChatPage(
+                          chatId: chatId,
+                          chatTitle: chatTitle,
+                          chatAvatar: chatAvatar,
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -70,6 +70,7 @@ class MainScreen extends ConsumerWidget {
     // Hide bottom navigation for nested routes
     return location.contains('/home/discussion') ||
         location.contains('/home/detail-reading') ||
+        location.contains('/home/chat') ||
         location.contains('/standalone-');
   }
 

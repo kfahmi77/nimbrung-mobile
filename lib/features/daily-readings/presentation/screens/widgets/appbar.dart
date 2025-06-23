@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
 import '../../../../../presentation/themes/color_schemes.dart';
@@ -46,16 +47,21 @@ class AppbarWidget extends StatelessWidget {
         ),
         Spacer(),
         // Icons
-        Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            shape: BoxShape.circle,
-          ),
-          child: SvgPicture.asset(
-            'assets/images/chat.svg',
-            width: 22,
-            height: 22,
+        InkWell(
+          onTap: () {
+            context.go('/home/chat');
+          },
+          child: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              shape: BoxShape.circle,
+            ),
+            child: SvgPicture.asset(
+              'assets/images/chat.svg',
+              width: 22,
+              height: 22,
+            ),
           ),
         ),
         8.width,
