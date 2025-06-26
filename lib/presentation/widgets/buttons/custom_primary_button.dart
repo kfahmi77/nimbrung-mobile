@@ -9,12 +9,12 @@ class CustomPrimaryButton extends StatelessWidget {
   final double height;
 
   const CustomPrimaryButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isLoading = false,
     this.height = 50,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

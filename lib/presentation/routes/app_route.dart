@@ -16,7 +16,7 @@ import '../screens/chat/chat_page.dart';
 import 'route_name.dart';
 
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/',
   debugLogDiagnostics: true, // Selalu enable untuk debugging
   // Tambahkan ini untuk memaksa URL sync
   routerNeglect: false,

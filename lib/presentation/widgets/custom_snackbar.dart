@@ -12,7 +12,7 @@ class CustomSnackbar extends StatefulWidget {
   final SnackBarBehavior behavior;
 
   const CustomSnackbar({
-    Key? key,
+    super.key,
     required this.message,
     this.type = SnackbarType.info,
     this.duration = const Duration(seconds: 4),
@@ -20,7 +20,7 @@ class CustomSnackbar extends StatefulWidget {
     this.showCloseButton = true,
     this.behavior = SnackBarBehavior.floating,
     this.margin = const EdgeInsets.all(16),
-  }) : super(key: key);
+  });
 
   @override
   State<CustomSnackbar> createState() => _CustomSnackbarState();

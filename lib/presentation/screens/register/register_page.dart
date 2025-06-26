@@ -1,8 +1,12 @@
 // refactored_register_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
+import 'package:nimbrung_mobile/core/providers/auth_provider.dart';
+import 'package:nimbrung_mobile/core/models/register_dto.dart';
 
 import '../../widgets/buttons/custom_google_button.dart';
 import '../../widgets/buttons/custom_primary_button.dart';
@@ -10,17 +14,18 @@ import '../../widgets/custom_drop_down_field.dart';
 import '../../widgets/custom_password_field.dart';
 import '../../widgets/custom_text_field.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _fullnameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   String? _selectedGender;
@@ -31,11 +36,35 @@ class _RegisterPageState extends State<RegisterPage> {
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _fullnameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final registerState = ref.watch(registerProvider);
+
+    // Listen to register state changes
+    ref.listen<RegisterState>(registerProvider, (previous, next) {
+      if (next.isSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.successMessage ?? 'Registrasi berhasil!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Navigate to register-update page
+        context.go('/register-update');
+      } else if (next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -138,6 +167,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       14.height,
 
+                      // Fullname Field
+                      CustomTextField(
+                        label: 'Nama Lengkap',
+                        hintText: 'Masukan nama lengkap',
+                        controller: _fullnameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Nama lengkap tidak boleh kosong';
+                          }
+                          if (value.length < 2) {
+                            return 'Nama lengkap minimal 2 karakter';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      14.height,
+
                       // Email Field
                       CustomTextField(
                         label: 'Email',
@@ -195,24 +242,41 @@ class _RegisterPageState extends State<RegisterPage> {
 
                       // Register Button
                       CustomPrimaryButton(
-                        text: 'Daftar',
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            if (_selectedGender == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Silakan pilih jenis kelamin'),
-                                ),
-                              );
-                              return;
-                            }
-                            // Handle registration logic
-                            print('Username: ${_usernameController.text}');
-                            print('Email: ${_emailController.text}');
-                            print('Gender: $_selectedGender');
-                            print('Password: ${_passwordController.text}');
-                          }
-                        },
+                        text:
+                            registerState.isLoading ? 'Mendaftar...' : 'Daftar',
+                        onPressed:
+                            registerState.isLoading
+                                ? null
+                                : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    if (_selectedGender == null) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Silakan pilih jenis kelamin',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    // Create register request
+                                    final registerRequest = RegisterRequest(
+                                      email: _emailController.text.trim(),
+                                      password: _passwordController.text,
+                                      username: _usernameController.text.trim(),
+                                      fullname: _fullnameController.text.trim(),
+                                      gender: _selectedGender,
+                                    );
+
+                                    // Call register method
+                                    await ref
+                                        .read(registerProvider.notifier)
+                                        .register(registerRequest);
+                                  }
+                                },
                       ),
 
                       24.height,
@@ -225,11 +289,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       // Login Link
                       Center(
                         child: GestureDetector(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () => context.go('/'),
                           child: RichText(
                             text: TextSpan(
                               text: 'Sudah punya akun? ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                               children: <TextSpan>[
                                 TextSpan(
                                   text: 'masuk disini',

@@ -1,24 +1,26 @@
 // refactored_login_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
+import 'package:nimbrung_mobile/core/providers/auth_provider.dart';
 
 import '../../widgets/buttons/custom_google_button.dart';
 import '../../widgets/buttons/custom_primary_button.dart';
 import '../../widgets/custom_password_field.dart';
 import '../../widgets/custom_text_field.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -32,6 +34,36 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loginState = ref.watch(loginProvider);
+
+    // Listen to login state changes
+    ref.listen<LoginState>(loginProvider, (previous, next) {
+      if (next.isSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login berhasil!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Check if profile is complete
+        if (next.user != null && next.user!.isProfileComplete) {
+          // Navigate to home page if profile is complete
+          context.go('/home');
+        } else {
+          // Navigate to register update page if profile is not complete
+          context.go('/register-update');
+        }
+      } else if (next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -167,12 +199,20 @@ class _LoginPageState extends State<LoginPage> {
 
                       // Login Button
                       CustomPrimaryButton(
-                        text: 'Masuk',
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            context.pushReplacementNamed(RouteNames.home);
-                          }
-                        },
+                        text: loginState.isLoading ? 'Masuk...' : 'Masuk',
+                        onPressed:
+                            loginState.isLoading
+                                ? null
+                                : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    await ref
+                                        .read(loginProvider.notifier)
+                                        .login(
+                                          _emailController.text.trim(),
+                                          _passwordController.text,
+                                        );
+                                  }
+                                },
                       ),
                       24.height,
                       // Google Login Button

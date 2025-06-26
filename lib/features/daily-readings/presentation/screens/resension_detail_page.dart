@@ -147,7 +147,7 @@ class _ReadingReviewDetailScreenState
         children: [
           // Reading Progress Indicator
           if (!_isReadingMode)
-            Container(
+            SizedBox(
               height: 3,
               child: LinearProgressIndicator(
                 value: _scrollProgress,
