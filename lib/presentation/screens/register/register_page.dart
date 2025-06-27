@@ -1,12 +1,10 @@
-// refactored_register_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
-import 'package:nimbrung_mobile/core/providers/auth_provider.dart';
-import 'package:nimbrung_mobile/core/models/register_dto.dart';
+import 'package:nimbrung_mobile/features/auth/auth.dart';
 
 import '../../widgets/buttons/custom_google_button.dart';
 import '../../widgets/buttons/custom_primary_button.dart';
@@ -42,25 +40,19 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    final registerState = ref.watch(registerProvider);
+    final registerState = ref.watch(registerNotifierProvider);
 
     // Listen to register state changes
-    ref.listen<RegisterState>(registerProvider, (previous, next) {
-      if (next.isSuccess) {
+    ref.listen<RegisterState>(registerNotifierProvider, (previous, next) {
+      if (next is RegisterSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.successMessage ?? 'Registrasi berhasil!'),
-            backgroundColor: Colors.green,
-          ),
+          SnackBar(content: Text(next.message), backgroundColor: Colors.green),
         );
         // Navigate to register-update page
         context.go('/register-update');
-      } else if (next.errorMessage != null) {
+      } else if (next is RegisterFailure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(next.message), backgroundColor: Colors.red),
         );
       }
     });
@@ -243,9 +235,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       // Register Button
                       CustomPrimaryButton(
                         text:
-                            registerState.isLoading ? 'Mendaftar...' : 'Daftar',
+                            registerState is RegisterLoading
+                                ? 'Mendaftar...'
+                                : 'Daftar',
                         onPressed:
-                            registerState.isLoading
+                            registerState is RegisterLoading
                                 ? null
                                 : () async {
                                   if (_formKey.currentState!.validate()) {
@@ -262,19 +256,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                                       return;
                                     }
 
-                                    // Create register request
-                                    final registerRequest = RegisterRequest(
-                                      email: _emailController.text.trim(),
-                                      password: _passwordController.text,
-                                      username: _usernameController.text.trim(),
-                                      fullname: _fullnameController.text.trim(),
-                                      gender: _selectedGender,
-                                    );
-
-                                    // Call register method
+                                    // Call register method using Clean Architecture
                                     await ref
-                                        .read(registerProvider.notifier)
-                                        .register(registerRequest);
+                                        .read(registerNotifierProvider.notifier)
+                                        .register(
+                                          email: _emailController.text.trim(),
+                                          password: _passwordController.text,
+                                          username:
+                                              _usernameController.text.trim(),
+                                          fullname:
+                                              _fullnameController.text.trim(),
+                                          gender: _selectedGender,
+                                        );
                                   }
                                 },
                       ),

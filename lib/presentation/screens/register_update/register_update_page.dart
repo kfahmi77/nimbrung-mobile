@@ -7,8 +7,7 @@ import 'package:nimbrung_mobile/presentation/widgets/custom_date_form_field.dart
 import 'package:nimbrung_mobile/presentation/widgets/custom_drop_down_field.dart';
 import 'package:nimbrung_mobile/presentation/widgets/profile_photo_picker.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
-import 'package:nimbrung_mobile/core/providers/auth_provider.dart';
-import 'package:nimbrung_mobile/core/models/profile_update_dto.dart';
+import 'package:nimbrung_mobile/features/auth/auth.dart';
 
 import '../../widgets/custom_text_field.dart';
 
@@ -24,9 +23,18 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
   final TextEditingController _placeController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  
+
   // Store selected preference ID instead of name
   String? _selectedPreferenceId;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load current user when page opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(currentUserNotifierProvider.notifier).getCurrentUser();
+    });
+  }
 
   @override
   void dispose() {
@@ -38,25 +46,23 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final profileUpdateState = ref.watch(profileUpdateProvider);
+    final profileUpdateState = ref.watch(profileUpdateNotifierProvider);
+    final currentUserState = ref.watch(currentUserNotifierProvider);
 
     // Listen to profile update state changes
-    ref.listen<ProfileUpdateState>(profileUpdateProvider, (previous, next) {
-      if (next.isSuccess) {
+    ref.listen<ProfileUpdateState>(profileUpdateNotifierProvider, (
+      previous,
+      next,
+    ) {
+      if (next is ProfileUpdateSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.successMessage ?? 'Profil berhasil diperbarui!'),
-            backgroundColor: Colors.green,
-          ),
+          SnackBar(content: Text(next.message), backgroundColor: Colors.green),
         );
         // Navigate to home page
         context.go('/home');
-      } else if (next.errorMessage != null) {
+      } else if (next is ProfileUpdateFailure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(next.message), backgroundColor: Colors.red),
         );
       }
     });
@@ -200,51 +206,59 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                       // Preferences Dropdown with data from database
                       Consumer(
                         builder: (context, ref, child) {
-                          final preferencesAsync = ref.watch(preferencesProvider);
-                          
+                          final preferencesAsync = ref.watch(
+                            preferencesProvider,
+                          );
+
                           return preferencesAsync.when(
-                            loading: () => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                            error: (error, stack) => Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Bidang',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey[600],
-                                  ),
+                            loading:
+                                () => const Center(
+                                  child: CircularProgressIndicator(),
                                 ),
-                                8.height,
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.red),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    'Gagal memuat data bidang: ${error.toString()}',
-                                    style: const TextStyle(color: Colors.red),
-                                  ),
+                            error:
+                                (error, stack) => Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Bidang',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    8.height,
+                                    Container(
+                                      padding: const EdgeInsets.all(16),
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.red),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        'Gagal memuat data bidang: ${error.toString()}',
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
                             data: (preferences) {
                               return CustomDropdownField<String>(
                                 label: 'Bidang',
                                 hintText: 'Pilih bidang favoritmu',
                                 value: _selectedPreferenceId,
-                                items: preferences.map((pref) => pref.id).toList(),
+                                items:
+                                    preferences.map((pref) => pref.id).toList(),
                                 itemLabel: (preferenceId) {
                                   // Find the preference name by ID
                                   final preference = preferences.firstWhere(
                                     (pref) => pref.id == preferenceId,
                                     orElse: () => preferences.first,
                                   );
-                                  return preference.preferencesName ?? 'Unknown';
+                                  return preference.preferencesName ??
+                                      'Unknown';
                                 },
                                 onChanged: (String? newValue) {
                                   setState(() {
@@ -268,7 +282,7 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                           minimumSize: const Size(double.infinity, 50),
                         ),
                         onPressed:
-                            profileUpdateState.isLoading
+                            profileUpdateState is ProfileUpdateLoading
                                 ? null
                                 : () async {
                                   if (_formKey.currentState!.validate()) {
@@ -285,14 +299,14 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                                       return;
                                     }
 
-                                    // Get current user ID from auth service
-                                    final authService = ref.read(
-                                      authServiceProvider,
-                                    );
-                                    final currentUser =
-                                        authService.getCurrentUser();
+                                    // Get current user from state
+                                    String? currentUserId;
+                                    if (currentUserState is CurrentUserLoaded &&
+                                        currentUserState.user != null) {
+                                      currentUserId = currentUserState.user!.id;
+                                    }
 
-                                    if (currentUser == null) {
+                                    if (currentUserId == null) {
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
@@ -312,7 +326,8 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                                     if (_dateController.text.isNotEmpty) {
                                       try {
                                         // Handle DD/MM/YYYY format from CustomDateField
-                                        final dateText = _dateController.text.trim();
+                                        final dateText =
+                                            _dateController.text.trim();
                                         if (dateText.contains('/')) {
                                           // Split DD/MM/YYYY format
                                           final parts = dateText.split('/');
@@ -320,9 +335,15 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                                             final day = int.parse(parts[0]);
                                             final month = int.parse(parts[1]);
                                             final year = int.parse(parts[2]);
-                                            dateBirth = DateTime(year, month, day);
+                                            dateBirth = DateTime(
+                                              year,
+                                              month,
+                                              day,
+                                            );
                                           } else {
-                                            throw const FormatException('Invalid date format');
+                                            throw const FormatException(
+                                              'Invalid date format',
+                                            );
                                           }
                                         } else {
                                           // Try to parse as ISO format
@@ -343,25 +364,24 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                                       }
                                     }
 
-                                    // Create profile update request
-                                    final profileRequest = ProfileUpdateRequest(
-                                      bio: _bioController.text.trim(),
-                                      birthPlace: _placeController.text.trim(),
-                                      dateBirth: dateBirth,
-                                      preferenceId: _selectedPreferenceId, // Use preference ID
-                                    );
-
                                     // Call profile update method
                                     await ref
-                                        .read(profileUpdateProvider.notifier)
+                                        .read(
+                                          profileUpdateNotifierProvider
+                                              .notifier,
+                                        )
                                         .updateProfile(
-                                          currentUser.id,
-                                          profileRequest,
+                                          userId: currentUserId,
+                                          bio: _bioController.text.trim(),
+                                          birthPlace:
+                                              _placeController.text.trim(),
+                                          dateBirth: dateBirth,
+                                          preferenceId: _selectedPreferenceId,
                                         );
                                   }
                                 },
                         child: Text(
-                          profileUpdateState.isLoading
+                          profileUpdateState is ProfileUpdateLoading
                               ? 'Memperbarui...'
                               : 'Selesai',
                           style: TextStyle(

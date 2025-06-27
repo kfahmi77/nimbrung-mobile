@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
-import 'package:nimbrung_mobile/core/providers/auth_provider.dart';
+import 'package:nimbrung_mobile/features/auth/auth.dart';
 
 import '../../widgets/buttons/custom_google_button.dart';
 import '../../widgets/buttons/custom_primary_button.dart';
@@ -34,11 +34,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final loginState = ref.watch(loginProvider);
+    final loginState = ref.watch(loginNotifierProvider);
 
     // Listen to login state changes
-    ref.listen<LoginState>(loginProvider, (previous, next) {
-      if (next.isSuccess) {
+    ref.listen<LoginState>(loginNotifierProvider, (previous, next) {
+      if (next is LoginSuccess) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Login berhasil!'),
@@ -47,19 +47,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         );
 
         // Check if profile is complete
-        if (next.user != null && next.user!.isProfileComplete) {
+        if (next.user.isProfileComplete) {
           // Navigate to home page if profile is complete
           context.go('/home');
         } else {
           // Navigate to register update page if profile is not complete
           context.go('/register-update');
         }
-      } else if (next.errorMessage != null) {
+      } else if (next is LoginFailure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(next.message), backgroundColor: Colors.red),
         );
       }
     });
@@ -199,17 +196,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                       // Login Button
                       CustomPrimaryButton(
-                        text: loginState.isLoading ? 'Masuk...' : 'Masuk',
+                        text: loginState is LoginLoading ? 'Masuk...' : 'Masuk',
                         onPressed:
-                            loginState.isLoading
+                            loginState is LoginLoading
                                 ? null
                                 : () async {
                                   if (_formKey.currentState!.validate()) {
                                     await ref
-                                        .read(loginProvider.notifier)
+                                        .read(loginNotifierProvider.notifier)
                                         .login(
-                                          _emailController.text.trim(),
-                                          _passwordController.text,
+                                          email: _emailController.text.trim(),
+                                          password: _passwordController.text,
                                         );
                                   }
                                 },

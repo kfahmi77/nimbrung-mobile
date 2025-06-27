@@ -1,14 +1,10 @@
-import 'package:equatable/equatable.dart';
+import '../../domain/entities/preference.dart';
 
-class PreferenceModel extends Equatable {
-  final String id;
-  final String? preferencesName;
-  final DateTime createdAt;
-
+class PreferenceModel extends Preference {
   const PreferenceModel({
-    required this.id,
-    this.preferencesName,
-    required this.createdAt,
+    required super.id,
+    super.preferencesName,
+    required super.createdAt,
   });
 
   factory PreferenceModel.fromJson(Map<String, dynamic> json) {
@@ -27,10 +23,7 @@ class PreferenceModel extends Equatable {
     };
   }
 
-  Map<String, dynamic> toInsertJson() {
-    return {'preferences_name': preferencesName};
-  }
-
+  @override
   PreferenceModel copyWith({
     String? id,
     String? preferencesName,
@@ -42,7 +35,4 @@ class PreferenceModel extends Equatable {
       createdAt: createdAt ?? this.createdAt,
     );
   }
-
-  @override
-  List<Object?> get props => [id, preferencesName, createdAt];
 }
