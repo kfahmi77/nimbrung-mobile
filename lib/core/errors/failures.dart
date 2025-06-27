@@ -40,3 +40,35 @@ class UnknownFailure extends Failure {
     super.code = 'UNKNOWN_ERROR',
   });
 }
+
+class AuthFailure extends Failure {
+  const AuthFailure({
+    required super.message,
+    super.code = 'AUTH_ERROR',
+    super.statusCode,
+  });
+}
+
+class DatabaseFailure extends Failure {
+  const DatabaseFailure({
+    required super.message,
+    super.code = 'DATABASE_ERROR',
+    super.statusCode,
+  });
+}
+
+class ValidationFailure extends Failure {
+  const ValidationFailure({
+    required super.message,
+    super.code = 'VALIDATION_ERROR',
+    super.statusCode,
+  });
+}
+
+class CacheFailure extends Failure {
+  const CacheFailure({
+    required super.message,
+    super.code = 'CACHE_ERROR',
+    super.statusCode,
+  });
+}
