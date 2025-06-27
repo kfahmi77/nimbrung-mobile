@@ -21,6 +21,7 @@ lib/
 ## 🔄 **Arsitektur Reusable Service:**
 
 ### 1. Core Service (`ImageUploadService`)
+
 - **Lokasi**: `lib/core/services/image_upload_service.dart`
 - **Fungsi**: Upload, delete, bucket management
 - **Reusable**: Bisa digunakan oleh semua fitur
@@ -33,6 +34,7 @@ lib/
   - `initializeCommonBuckets()` - Initialize semua bucket
 
 ### 2. Feature-Specific Services
+
 - **Auth**: `AuthImageService` - Wrapper untuk auth-specific logic
 - **Posts**: `PostImageService` - Future wrapper untuk post images
 - **Etc**: Service lain sesuai kebutuhan
@@ -40,6 +42,7 @@ lib/
 ## 📋 **Keuntungan Arsitektur Ini:**
 
 ### ✅ **Reusability**
+
 ```dart
 // Auth feature
 final authImageService = AuthImageService();
@@ -55,16 +58,19 @@ await imageService.uploadImage(bucketName: 'custom', ...);
 ```
 
 ### ✅ **Maintainability**
+
 - Core logic di satu tempat
 - Update sekali, berlaku untuk semua fitur
 - Clear separation of concerns
 
 ### ✅ **Flexibility**
+
 - Support multiple buckets (`avatars`, `posts`, etc.)
 - Support folder structure per user
 - Configurable file size limits dan MIME types
 
 ### ✅ **Security**
+
 - User-specific folders (`userId/avatar_timestamp.jpg`)
 - Proper RLS policies
 - Type-safe operations
@@ -72,6 +78,7 @@ await imageService.uploadImage(bucketName: 'custom', ...);
 ## 🔧 **Implementasi:**
 
 ### Core Service Usage:
+
 ```dart
 final imageService = ImageUploadService();
 
@@ -91,6 +98,7 @@ final avatarUrl = await imageService.uploadAvatar(
 ```
 
 ### Feature-Specific Service Usage:
+
 ```dart
 final authImageService = AuthImageService();
 
@@ -102,6 +110,7 @@ final avatarUrl = await authImageService.uploadUserAvatar(
 ```
 
 ### Riverpod Integration:
+
 ```dart
 // Core service provider
 final imageUploadServiceProvider = Provider<ImageUploadService>((ref) {
@@ -125,7 +134,7 @@ Supabase Storage:
       avatar_timestamp2.png
     userId2/
       avatar_timestamp3.jpg
-  
+
   posts/
     userId1/
       postId1/
@@ -138,6 +147,7 @@ Supabase Storage:
 ## 📚 **Migrations dari Structure Lama:**
 
 ### Before (Per-Feature):
+
 ```dart
 // Auth feature
 lib/features/auth/data/services/image_upload_service.dart
@@ -147,6 +157,7 @@ lib/features/posts/data/services/image_upload_service.dart
 ```
 
 ### After (Reusable):
+
 ```dart
 // Core reusable service
 lib/core/services/image_upload_service.dart
@@ -159,6 +170,7 @@ lib/features/posts/data/services/post_image_service.dart
 ## 🚀 **Usage dalam Different Features:**
 
 ### 1. User Profile (Auth)
+
 ```dart
 final authImageService = ref.watch(authImageServiceProvider);
 final avatarUrl = await authImageService.uploadUserAvatar(
@@ -168,6 +180,7 @@ final avatarUrl = await authImageService.uploadUserAvatar(
 ```
 
 ### 2. Post Images (Future Feature)
+
 ```dart
 final postImageService = ref.watch(postImageServiceProvider);
 final imageUrl = await postImageService.uploadPostImage(
@@ -178,6 +191,7 @@ final imageUrl = await postImageService.uploadPostImage(
 ```
 
 ### 3. Custom Usage
+
 ```dart
 final imageService = ref.watch(imageUploadServiceProvider);
 final url = await imageService.uploadImage(

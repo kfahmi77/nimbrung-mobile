@@ -6,7 +6,7 @@ class AuthImageService {
   final ImageUploadService _imageUploadService;
 
   AuthImageService({ImageUploadService? imageUploadService})
-      : _imageUploadService = imageUploadService ?? ImageUploadService();
+    : _imageUploadService = imageUploadService ?? ImageUploadService();
 
   /// Upload user avatar with auth-specific logic
   Future<String?> uploadUserAvatar({

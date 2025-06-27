@@ -6,6 +6,7 @@ import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 import 'package:nimbrung_mobile/features/auth/auth.dart';
 
+import '../../routes/route_name.dart';
 import '../../widgets/buttons/custom_google_button.dart';
 import '../../widgets/buttons/custom_primary_button.dart';
 import '../../widgets/custom_drop_down_field.dart';
@@ -282,7 +283,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       // Login Link
                       Center(
                         child: GestureDetector(
-                          onTap: () => context.go('/'),
+                          onTap: () => context.pushNamed(RouteNames.login),
                           child: RichText(
                             text: TextSpan(
                               text: 'Sudah punya akun? ',

@@ -2,12 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/logger.dart';
 import '../../domain/usecases/login.dart';
 import '../state/auth_state.dart';
+import '../providers/auth_providers.dart';
 
 class LoginNotifier extends StateNotifier<LoginState> {
   final LoginUseCase _loginUseCase;
+  final Ref _ref;
 
-  LoginNotifier({required LoginUseCase loginUseCase})
+  LoginNotifier({required LoginUseCase loginUseCase, required Ref ref})
     : _loginUseCase = loginUseCase,
+      _ref = ref,
       super(const LoginInitial());
 
   Future<void> login({required String email, required String password}) async {
@@ -30,6 +33,9 @@ class LoginNotifier extends StateNotifier<LoginState> {
       (user) {
         AppLogger.info('Login successful', tag: 'LoginNotifier');
         state = LoginSuccess(user: user);
+
+        // Update app auth state
+        _ref.read(appAuthNotifierProvider.notifier).setAuthenticated(user);
       },
     );
   }

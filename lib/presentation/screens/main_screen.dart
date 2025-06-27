@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../providers/visibility_provider.dart';
 import '../themes/color_schemes.dart';
+import '../../features/auth/presentation/providers/auth_providers.dart';
+import '../../features/auth/presentation/notifiers/app_auth_notifier.dart';
 
 class MainScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -13,6 +15,14 @@ class MainScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isVisible = ref.watch(bottomNavVisibilityProvider);
+
+    // Listen to auth state for logout navigation
+    ref.listen<AppAuthState>(appAuthNotifierProvider, (previous, next) {
+      if (next is AppAuthUnauthenticated) {
+        // User logged out, navigate to splash/login
+        context.go('/');
+      }
+    });
 
     // Check if current location is a nested route that should hide bottom nav
     final currentLocation = GoRouterState.of(context).uri.toString();

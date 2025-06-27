@@ -9,7 +9,7 @@ class ImageUploadService {
   final SupabaseClient _client = Supabase.instance.client;
 
   /// Upload image to specified bucket and folder
-  /// 
+  ///
   /// [bucketName] - The storage bucket name (e.g., 'avatars', 'posts')
   /// [folderPath] - Optional folder path within bucket (e.g., 'userId', 'posts/userId')
   /// [fileName] - The filename to use, or null to auto-generate
@@ -42,18 +42,17 @@ class ImageUploadService {
       } else {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         String extension = 'jpg'; // default
-        
+
         if (filePath != null) {
           extension = filePath.split('.').last.toLowerCase();
         }
-        
+
         finalFileName = '${filePrefix}_$timestamp.$extension';
       }
 
       // Add folder path if provided
-      final fullPath = folderPath != null 
-          ? '$folderPath/$finalFileName' 
-          : finalFileName;
+      final fullPath =
+          folderPath != null ? '$folderPath/$finalFileName' : finalFileName;
 
       // Upload file to Supabase storage
       if (bytes != null) {
@@ -66,9 +65,7 @@ class ImageUploadService {
       }
 
       // Get public URL
-      final publicUrl = _client.storage
-          .from(bucketName)
-          .getPublicUrl(fullPath);
+      final publicUrl = _client.storage.from(bucketName).getPublicUrl(fullPath);
 
       AppLogger.info(
         'Image uploaded successfully: $publicUrl',
@@ -127,7 +124,7 @@ class ImageUploadService {
       final uri = Uri.parse(imageUrl);
       final pathSegments = uri.pathSegments;
       final bucketIndex = pathSegments.indexOf(bucketName);
-      
+
       if (bucketIndex != -1 && bucketIndex < pathSegments.length - 1) {
         final relativePath = pathSegments.sublist(bucketIndex + 1).join('/');
         await _client.storage.from(bucketName).remove([relativePath]);
@@ -170,12 +167,9 @@ class ImageUploadService {
         bucketName,
         BucketOptions(
           public: isPublic,
-          allowedMimeTypes: allowedMimeTypes ?? [
-            'image/jpeg', 
-            'image/png', 
-            'image/webp',
-            'image/gif'
-          ],
+          allowedMimeTypes:
+              allowedMimeTypes ??
+              ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
           fileSizeLimit: fileSizeLimit ?? '10MB',
         ),
       );

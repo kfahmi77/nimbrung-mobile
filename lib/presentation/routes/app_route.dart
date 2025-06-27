@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/features/daily-readings/presentation/screens/resension_detail_page.dart';
 import 'package:nimbrung_mobile/presentation/screens/homepage/discussion_room_page.dart';
+import 'package:nimbrung_mobile/presentation/screens/splash/splash_screen.dart';
 
 import '../screens/library/library_page.dart';
 import '../screens/homepage/home_page.dart';
@@ -17,12 +18,18 @@ import 'route_name.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
-  debugLogDiagnostics: true, // Selalu enable untuk debugging
-  // Tambahkan ini untuk memaksa URL sync
+  debugLogDiagnostics: true,
   routerNeglect: false,
   routes: [
+    // Splash screen - initial route
     GoRoute(
       path: '/',
+      name: RouteNames.splash,
+      builder: (context, state) => const SplashScreen(),
+    ),
+    // Login page
+    GoRoute(
+      path: '/login',
       name: RouteNames.login,
       builder: (context, state) => const LoginPage(),
     ),

@@ -2,12 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/logger.dart';
 import '../../domain/usecases/register.dart';
 import '../state/auth_state.dart';
+import '../providers/auth_providers.dart';
 
 class RegisterNotifier extends StateNotifier<RegisterState> {
   final RegisterUseCase _registerUseCase;
+  final Ref _ref;
 
-  RegisterNotifier({required RegisterUseCase registerUseCase})
+  RegisterNotifier({required RegisterUseCase registerUseCase, required Ref ref})
     : _registerUseCase = registerUseCase,
+      _ref = ref,
       super(const RegisterInitial());
 
   Future<void> register({
@@ -45,6 +48,9 @@ class RegisterNotifier extends StateNotifier<RegisterState> {
           user: user,
           message: 'Registrasi berhasil! Silakan cek email untuk verifikasi.',
         );
+
+        // Update app auth state
+        _ref.read(appAuthNotifierProvider.notifier).setAuthenticated(user);
       },
     );
   }

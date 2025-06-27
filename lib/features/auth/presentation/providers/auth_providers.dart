@@ -14,6 +14,7 @@ import '../notifiers/register_notifier.dart';
 import '../notifiers/profile_update_notifier.dart';
 import '../notifiers/profile_update_with_image_notifier.dart';
 import '../notifiers/current_user_notifier.dart';
+import '../notifiers/app_auth_notifier.dart';
 import '../state/auth_state.dart';
 import '../../domain/entities/preference.dart';
 import '../../../../core/usecases/usecase.dart';
@@ -77,13 +78,13 @@ final loginNotifierProvider = StateNotifierProvider<LoginNotifier, LoginState>((
   ref,
 ) {
   final loginUseCase = ref.watch(loginUseCaseProvider);
-  return LoginNotifier(loginUseCase: loginUseCase);
+  return LoginNotifier(loginUseCase: loginUseCase, ref: ref);
 });
 
 final registerNotifierProvider =
     StateNotifierProvider<RegisterNotifier, RegisterState>((ref) {
       final registerUseCase = ref.watch(registerUseCaseProvider);
-      return RegisterNotifier(registerUseCase: registerUseCase);
+      return RegisterNotifier(registerUseCase: registerUseCase, ref: ref);
     });
 
 final profileUpdateNotifierProvider =
@@ -108,6 +109,17 @@ final currentUserNotifierProvider =
     StateNotifierProvider<CurrentUserNotifier, CurrentUserState>((ref) {
       final getCurrentUserUseCase = ref.watch(getCurrentUserUseCaseProvider);
       return CurrentUserNotifier(getCurrentUserUseCase: getCurrentUserUseCase);
+    });
+
+// App-wide authentication provider
+final appAuthNotifierProvider =
+    StateNotifierProvider<AppAuthNotifier, AppAuthState>((ref) {
+      final getCurrentUserUseCase = ref.watch(getCurrentUserUseCaseProvider);
+      final logoutUseCase = ref.watch(logoutUseCaseProvider);
+      return AppAuthNotifier(
+        getCurrentUserUseCase: getCurrentUserUseCase,
+        logoutUseCase: logoutUseCase,
+      );
     });
 
 // Additional providers

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
+import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage>
+class _ProfilePageState extends ConsumerState<ProfilePage>
     with TickerProviderStateMixin {
   late ScrollController _scrollController;
   late AnimationController _fadeController;
@@ -79,14 +81,14 @@ class _ProfilePageState extends State<ProfilePage>
             // Enhanced background with parallax effect
             _buildParallaxBackground(),
 
-            // Animated floating settings button
-            _buildFloatingSettingsButton(),
-
             // Main scrollable content
             _buildScrollableContent(),
 
             // Animated profile picture with glow effect
             _buildAnimatedProfilePicture(),
+
+            // Animated floating settings button (moved to last for proper z-index)
+            _buildFloatingSettingsButton(),
           ],
         ),
       ),
@@ -108,7 +110,7 @@ class _ProfilePageState extends State<ProfilePage>
           ),
         ),
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             image: DecorationImage(
               image: NetworkImage(
                 'https://raw.githubusercontent.com/kfahmi77/api-mockup-nimbrung/refs/heads/main/version%200.png',
@@ -127,31 +129,40 @@ class _ProfilePageState extends State<ProfilePage>
       curve: Curves.easeInOut,
       top: _isScrolled ? 50 : 40,
       right: 20,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color:
-              _isScrolled
-                  ? Colors.white.withOpacity(0.9)
-                  : Colors.black.withOpacity(0.5),
-          shape: BoxShape.circle,
-          boxShadow:
-              _isScrolled
-                  ? [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                  : [],
-        ),
-        child: Icon(
-          Icons.settings,
-          color: _isScrolled ? Colors.black87 : Colors.white,
-          size: 24,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            _showSettingsBottomSheet();
+          },
+          borderRadius: BorderRadius.circular(50),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color:
+                  _isScrolled
+                      ? Colors.white.withOpacity(0.9)
+                      : Colors.black.withOpacity(0.5),
+              shape: BoxShape.circle,
+              boxShadow:
+                  _isScrolled
+                      ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                      : [],
+            ),
+            child: Icon(
+              Icons.settings,
+              color: _isScrolled ? Colors.black87 : Colors.white,
+              size: 24,
+            ),
+          ),
         ),
       ),
     );
@@ -160,10 +171,10 @@ class _ProfilePageState extends State<ProfilePage>
   Widget _buildScrollableContent() {
     return CustomScrollView(
       controller: _scrollController,
-      physics: ClampingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       slivers: [
         // Flexible space for background
-        SliverToBoxAdapter(child: SizedBox(height: 180)),
+        const SliverToBoxAdapter(child: SizedBox(height: 180)),
 
         // Main content with animated container
         SliverToBoxAdapter(
@@ -278,7 +289,7 @@ class _ProfilePageState extends State<ProfilePage>
             child: Center(
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     'Karien Zain',
                     style: TextStyle(
                       fontSize: 28,
@@ -383,7 +394,7 @@ class _ProfilePageState extends State<ProfilePage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Tentang saya',
                     style: TextStyle(
                       fontSize: 20,
@@ -433,7 +444,7 @@ class _ProfilePageState extends State<ProfilePage>
                 children: [
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         'Karya Tulis Terbaru',
                         style: TextStyle(
                           fontSize: 20,
@@ -506,7 +517,7 @@ class _ProfilePageState extends State<ProfilePage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   '7 Mata Menyala',
                                   style: TextStyle(
                                     fontSize: 22,
@@ -565,5 +576,141 @@ class _ProfilePageState extends State<ProfilePage>
         );
       },
     );
+  }
+
+  void _showSettingsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder:
+          (context) => Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Settings title
+                  Text(
+                    'Pengaturan',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Settings options
+                  ListTile(
+                    leading: const Icon(Icons.edit, color: AppColors.primary),
+                    title: const Text('Edit Profil'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Navigate to edit profile
+                    },
+                  ),
+
+                  ListTile(
+                    leading: const Icon(
+                      Icons.notifications,
+                      color: AppColors.primary,
+                    ),
+                    title: const Text('Notifikasi'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Navigate to notification settings
+                    },
+                  ),
+
+                  ListTile(
+                    leading: const Icon(Icons.help, color: AppColors.primary),
+                    title: const Text('Bantuan'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Navigate to help
+                    },
+                  ),
+
+                  const Divider(),
+
+                  // Logout option
+                  ListTile(
+                    leading: const Icon(Icons.logout, color: Colors.red),
+                    title: const Text(
+                      'Keluar',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showLogoutDialog();
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Konfirmasi Keluar'),
+            content: const Text(
+              'Apakah Anda yakin ingin keluar dari aplikasi?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _logout();
+                },
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('Keluar'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Future<void> _logout() async {
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // Perform logout
+    await ref.read(appAuthNotifierProvider.notifier).logout();
+
+    // Navigation will be handled by auth state listener in splash/main
+    if (mounted) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
   }
 }
