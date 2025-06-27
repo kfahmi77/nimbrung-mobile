@@ -21,7 +21,7 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         password: password,
       );
-      return Right(result);
+      return Right(result.toEntity());
     } catch (e) {
       AppLogger.error(
         'Repository: Login failed',
@@ -48,7 +48,7 @@ class AuthRepositoryImpl implements AuthRepository {
         fullname: fullname,
         gender: gender,
       );
-      return Right(result);
+      return Right(result.toEntity());
     } catch (e) {
       AppLogger.error(
         'Repository: Registration failed',
@@ -78,7 +78,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User?>> getCurrentUser() async {
     try {
       final result = await remoteDataSource.getCurrentUser();
-      return Right(result);
+      return Right(result?.toEntity());
     } catch (e) {
       AppLogger.error(
         'Repository: Get current user failed',
@@ -108,7 +108,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> getUserProfile(String userId) async {
     try {
       final result = await remoteDataSource.getUserProfile(userId);
-      return Right(result);
+      return Right(result.toEntity());
     } catch (e) {
       AppLogger.error(
         'Repository: Get user profile failed',
@@ -137,7 +137,7 @@ class AuthRepositoryImpl implements AuthRepository {
         preferenceId: preferenceId,
         avatar: avatar,
       );
-      return Right(result);
+      return Right(result.toEntity());
     } catch (e) {
       AppLogger.error(
         'Repository: Update profile failed',
@@ -152,7 +152,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, List<Preference>>> getPreferences() async {
     try {
       final result = await remoteDataSource.getPreferences();
-      return Right(result);
+      // Convert PreferenceModel list to Preference entity list
+      final preferences = result.map((model) => model.toEntity()).toList();
+      return Right(preferences);
     } catch (e) {
       AppLogger.error(
         'Repository: Get preferences failed',
@@ -169,7 +171,7 @@ class AuthRepositoryImpl implements AuthRepository {
   ) async {
     try {
       final result = await remoteDataSource.createPreference(preferenceName);
-      return Right(result);
+      return Right(result.toEntity());
     } catch (e) {
       AppLogger.error(
         'Repository: Create preference failed',

@@ -15,5 +15,6 @@ export 'presentation/state/auth_state.dart';
 export 'presentation/notifiers/login_notifier.dart';
 export 'presentation/notifiers/register_notifier.dart';
 export 'presentation/notifiers/profile_update_notifier.dart';
+export 'presentation/notifiers/profile_update_with_image_notifier.dart';
 export 'presentation/notifiers/current_user_notifier.dart';
 export 'presentation/providers/auth_providers.dart';

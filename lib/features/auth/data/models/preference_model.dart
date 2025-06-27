@@ -23,6 +23,15 @@ class PreferenceModel extends Preference {
     };
   }
 
+  // Convert model to entity
+  Preference toEntity() {
+    return Preference(
+      id: id,
+      preferencesName: preferencesName,
+      createdAt: createdAt,
+    );
+  }
+
   @override
   PreferenceModel copyWith({
     String? id,

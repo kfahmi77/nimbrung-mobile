@@ -89,6 +89,29 @@ class UserModel extends User {
     }
   }
 
+  // Convert model to entity
+  User toEntity() {
+    return User(
+      id: id,
+      username: username,
+      fullname: fullname,
+      email: email,
+      avatar: avatar,
+      bio: bio,
+      dateBirth: dateBirth,
+      birthPlace: birthPlace,
+      isPremium: isPremium,
+      preferenceId: preferenceId,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      role: role,
+      gender: gender,
+      statusUser: statusUser,
+      isProfileComplete: isProfileComplete,
+    );
+  }
+
+  @override
   UserModel copyWith({
     String? id,
     String? username,

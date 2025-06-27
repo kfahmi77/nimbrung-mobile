@@ -12,14 +12,27 @@ import '../../domain/usecases/get_preferences.dart';
 import '../notifiers/login_notifier.dart';
 import '../notifiers/register_notifier.dart';
 import '../notifiers/profile_update_notifier.dart';
+import '../notifiers/profile_update_with_image_notifier.dart';
 import '../notifiers/current_user_notifier.dart';
 import '../state/auth_state.dart';
 import '../../domain/entities/preference.dart';
 import '../../../../core/usecases/usecase.dart';
+import '../../../../core/services/image_upload_service.dart';
+import '../../data/services/auth_image_service.dart';
 
 // Data Sources
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   return AuthRemoteDataSourceImpl();
+});
+
+// Image Services
+final imageUploadServiceProvider = Provider<ImageUploadService>((ref) {
+  return ImageUploadService();
+});
+
+final authImageServiceProvider = Provider<AuthImageService>((ref) {
+  final imageUploadService = ref.watch(imageUploadServiceProvider);
+  return AuthImageService(imageUploadService: imageUploadService);
 });
 
 // Repositories
@@ -77,6 +90,18 @@ final profileUpdateNotifierProvider =
     StateNotifierProvider<ProfileUpdateNotifier, ProfileUpdateState>((ref) {
       final updateProfileUseCase = ref.watch(updateProfileUseCaseProvider);
       return ProfileUpdateNotifier(updateProfileUseCase: updateProfileUseCase);
+    });
+
+final profileUpdateWithImageNotifierProvider =
+    StateNotifierProvider<ProfileUpdateWithImageNotifier, ProfileUpdateState>((
+      ref,
+    ) {
+      final updateProfileUseCase = ref.watch(updateProfileUseCaseProvider);
+      final authImageService = ref.watch(authImageServiceProvider);
+      return ProfileUpdateWithImageNotifier(
+        updateProfileUseCase: updateProfileUseCase,
+        authImageService: authImageService,
+      );
     });
 
 final currentUserNotifierProvider =

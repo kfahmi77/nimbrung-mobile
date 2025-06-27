@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:nimbrung_mobile/presentation/routes/app_route.dart';
 import 'package:nimbrung_mobile/core/config/supabase_config.dart';
+import 'package:nimbrung_mobile/core/services/image_upload_service.dart';
 
 import 'presentation/themes/app_theme.dart';
 
@@ -17,6 +18,11 @@ void main() async {
       anonKey: SupabaseConfig.supabaseAnonKey,
     );
     debugPrint('Supabase initialized successfully');
+
+    // Initialize storage buckets for different features
+    final imageUploadService = ImageUploadService();
+    await imageUploadService.initializeCommonBuckets();
+    debugPrint('Storage buckets initialized');
   } catch (e) {
     debugPrint('Error initializing Supabase: $e');
   }

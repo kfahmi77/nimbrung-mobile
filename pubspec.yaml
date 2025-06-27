@@ -1,6 +1,6 @@
 name: nimbrung_mobile
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -15,7 +15,9 @@ dependencies:
   flutter_riverpod: ^2.6.1
   flutter_svg: ^2.1.0
   go_router: ^15.1.2
+  image_picker: ^1.0.7
   logger: ^2.5.0
+  permission_handler: ^11.3.0
   supabase_flutter: ^2.8.0
 
 dev_dependencies:

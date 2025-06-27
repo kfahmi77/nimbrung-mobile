@@ -5,9 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/widgets/custom_date_form_field.dart';
 import 'package:nimbrung_mobile/presentation/widgets/custom_drop_down_field.dart';
-import 'package:nimbrung_mobile/presentation/widgets/profile_photo_picker.dart';
+import 'package:nimbrung_mobile/presentation/widgets/enhanced_profile_photo_picker.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 import 'package:nimbrung_mobile/features/auth/auth.dart';
+import 'dart:io';
 
 import '../../widgets/custom_text_field.dart';
 
@@ -26,6 +27,9 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
 
   // Store selected preference ID instead of name
   String? _selectedPreferenceId;
+
+  // Store selected avatar file
+  File? _selectedAvatarFile;
 
   @override
   void initState() {
@@ -46,11 +50,13 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final profileUpdateState = ref.watch(profileUpdateNotifierProvider);
+    final profileUpdateState = ref.watch(
+      profileUpdateWithImageNotifierProvider,
+    );
     final currentUserState = ref.watch(currentUserNotifierProvider);
 
     // Listen to profile update state changes
-    ref.listen<ProfileUpdateState>(profileUpdateNotifierProvider, (
+    ref.listen<ProfileUpdateState>(profileUpdateWithImageNotifierProvider, (
       previous,
       next,
     ) {
@@ -148,7 +154,21 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       24.height,
-                      Center(child: ProfilePhotoPicker(label: "Foto Profil")),
+                      Center(
+                        child: ProfilePhotoPicker(
+                          label: "Foto Profil",
+                          onImageSelected: (File? file) {
+                            setState(() {
+                              _selectedAvatarFile = file;
+                            });
+                          },
+                          initialImageUrl:
+                              currentUserState is CurrentUserLoaded &&
+                                      currentUserState.user != null
+                                  ? currentUserState.user!.avatar
+                                  : null,
+                        ),
+                      ),
                       24.height,
                       8.height,
                       CustomTextField(
@@ -255,7 +275,15 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                                   // Find the preference name by ID
                                   final preference = preferences.firstWhere(
                                     (pref) => pref.id == preferenceId,
-                                    orElse: () => preferences.first,
+                                    orElse:
+                                        () =>
+                                            preferences.isNotEmpty
+                                                ? preferences.first
+                                                : Preference(
+                                                  id: '',
+                                                  preferencesName: 'Unknown',
+                                                  createdAt: DateTime.now(),
+                                                ),
                                   );
                                   return preference.preferencesName ??
                                       'Unknown';
@@ -364,19 +392,29 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                                       }
                                     }
 
-                                    // Call profile update method
+                                    // Call profile update method with image
                                     await ref
                                         .read(
-                                          profileUpdateNotifierProvider
+                                          profileUpdateWithImageNotifierProvider
                                               .notifier,
                                         )
-                                        .updateProfile(
+                                        .updateProfileWithImage(
                                           userId: currentUserId,
                                           bio: _bioController.text.trim(),
                                           birthPlace:
                                               _placeController.text.trim(),
                                           dateBirth: dateBirth,
                                           preferenceId: _selectedPreferenceId,
+                                          avatarFile: _selectedAvatarFile,
+                                          existingAvatarUrl:
+                                              currentUserState
+                                                          is CurrentUserLoaded &&
+                                                      currentUserState.user !=
+                                                          null
+                                                  ? currentUserState
+                                                      .user!
+                                                      .avatar
+                                                  : null,
                                         );
                                   }
                                 },
