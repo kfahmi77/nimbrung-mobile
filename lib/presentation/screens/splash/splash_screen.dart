@@ -34,10 +34,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Widget build(BuildContext context) {
     ref.listen<AppAuthState>(appAuthNotifierProvider, (previous, next) {
       if (next is AppAuthAuthenticated) {
-        // User is authenticated, navigate to home
+        // Navigasi ke shell route utama agar bottom navigation muncul
         context.go('/home');
       } else if (next is AppAuthUnauthenticated) {
-        // User is not authenticated, navigate to login
         context.go('/login');
       } else if (next is AppAuthError) {
         // Show error snackbar but stay on splash

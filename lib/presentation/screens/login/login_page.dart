@@ -9,7 +9,6 @@ import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 import 'package:nimbrung_mobile/features/auth/auth.dart';
-import 'package:nimbrung_mobile/features/auth/presentation/notifiers/app_auth_notifier.dart';
 import 'package:nimbrung_mobile/presentation/widgets/custom_snackbar.dart';
 
 import '../../widgets/buttons/custom_google_button.dart';
@@ -44,10 +43,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref.listen<AppAuthState>(appAuthNotifierProvider, (previous, next) {
       if (next is AppAuthAuthenticated) {
         // User is authenticated, navigate based on profile completion
+        // Use pushReplacement to completely replace the navigation stack
         if (next.user.isProfileComplete) {
-          context.go('/home');
+          // Clear the entire navigation stack and go to home
+          context.goNamed(RouteNames.home);
+          // Alternative: Use pushReplacementNamed if available
+          // context.pushReplacementNamed(RouteNames.home);
         } else {
-          context.go('/register-update');
+          // Clear the stack and go to profile update
+          context.goNamed(RouteNames.registerUpdate);
+          // Alternative: Use pushReplacementNamed if available
+          // context.pushReplacementNamed(RouteNames.registerUpdate);
         }
       }
     });
@@ -59,8 +65,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           message: 'Login successful!',
           type: SnackbarType.success,
         );
-        // Optionally navigate to home or another page
-        context.go('/home');
+        // Don't navigate here as it's handled by AppAuthState listener above
+        // This prevents double navigation which can cause navigation stack issues
       } else if (next is LoginFailure) {
         context.showCustomSnackbar(
           message: next.message,

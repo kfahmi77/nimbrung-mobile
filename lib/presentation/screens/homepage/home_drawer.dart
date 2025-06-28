@@ -331,7 +331,6 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-
                 _logout();
               },
               child: Text('Keluar', style: TextStyle(color: AppColors.danger)),
@@ -343,20 +342,52 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
   }
 
   Future<void> _logout() async {
-    // Show loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
+    try {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
 
-    // Perform logout
-    await ref.read(appAuthNotifierProvider.notifier).logout();
+      // Perform logout - this should update the auth state
+      await ref.read(appAuthNotifierProvider.notifier).logout();
 
-    // Navigation will be handled by auth state listener in splash/main
-    if (mounted) {
-      context.goNamed(RouteNames.login);
-      // Navigator.of(context).popUntil((route) => route.isFirst);
+      // Close loading dialog if still open
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+
+      // IMPORTANT: Complete navigation stack reset and go to login
+      // This ensures the bottom navigation state is completely cleared
+      if (mounted) {
+        // Method 1: Use go with clearing stack
+        // context.go('/login');
+
+        // Alternative Method 2: If you have access to GoRouter instance
+        GoRouter.of(context).refresh();
+        context.go('/login');
+
+        // Alternative Method 3: Clear all routes and push login
+        // Navigator.of(
+        //   context,
+        // ).pushNamedAndRemoveUntil(RouteNames.login, (route) => false);
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Logout failed: ${e.toString()}'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
     }
   }
 }
