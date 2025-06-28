@@ -1,17 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
 import '../../themes/color_schemes.dart';
 
-class AppbarWidget extends StatelessWidget {
+class AppbarWidget extends ConsumerStatefulWidget {
   const AppbarWidget({super.key});
+
+  @override
+  ConsumerState<AppbarWidget> createState() => _AppbarWidgetState();
+}
+
+class _AppbarWidgetState extends ConsumerState<AppbarWidget> {
+  void _openDrawer() {
+    Scaffold.of(context).openDrawer();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // Hamburger menu icon
+        InkWell(
+          onTap: _openDrawer,
+          child: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.menu,
+              color: AppColors.primary,
+              size: 24,
+            ),
+          ),
+        ),
+
+        12.width,
+        
         CircleAvatar(
           radius: 22,
           backgroundColor: Colors.white,
