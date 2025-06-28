@@ -36,12 +36,14 @@ class MainScreen extends ConsumerWidget {
       bottomNavigationBar: AnimatedSlide(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        offset: (isVisible && !shouldHideBottomNav && !isDrawerOpen)
-            ? Offset.zero
-            : const Offset(0, 1),
+        offset:
+            (isVisible && !shouldHideBottomNav && !isDrawerOpen)
+                ? Offset.zero
+                : const Offset(0, 1),
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
-          opacity: (isVisible && !shouldHideBottomNav && !isDrawerOpen) ? 1.0 : 0.0,
+          opacity:
+              (isVisible && !shouldHideBottomNav && !isDrawerOpen) ? 1.0 : 0.0,
           child: Container(
             margin: const EdgeInsets.only(bottom: 24, right: 58, left: 58),
             decoration: BoxDecoration(
@@ -52,7 +54,8 @@ class MainScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [                  _NavItem(
+                children: [
+                  _NavItem(
                     icon: Icons.home_rounded,
                     index: 0,
                     selectedIndex: navigationShell.currentIndex,

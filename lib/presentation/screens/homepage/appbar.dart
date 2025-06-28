@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
 import '../../themes/color_schemes.dart';
+import '../../widgets/user_avatar.dart';
 
 class AppbarWidget extends ConsumerStatefulWidget {
   const AppbarWidget({super.key});
@@ -31,28 +32,23 @@ class _AppbarWidgetState extends ConsumerState<AppbarWidget> {
               color: AppColors.background,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.menu,
-              color: AppColors.primary,
-              size: 24,
-            ),
+            child: Icon(Icons.menu, color: AppColors.primary, size: 24),
           ),
         ),
 
         12.width,
-        
-        CircleAvatar(
-          radius: 22,
-          backgroundColor: Colors.white,
-          child: CircleAvatar(
-            radius: 20,
-            backgroundImage: NetworkImage(
-              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-            ),
-          ),
+
+        // User Avatar using reusable widget
+        UserAvatar(
+          radius: 20,
+          borderRadius: 22,
+          borderColor: Colors.white,
+          borderWidth: 2,
         ),
 
         12.width,
+
+        // User Greeting
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -64,8 +60,9 @@ class _AppbarWidgetState extends ConsumerState<AppbarWidget> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            Text(
-              'Nimbrung',
+            UserDisplayName(
+              preferUsername: true,
+              fallbackText: 'Nimbrung',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,

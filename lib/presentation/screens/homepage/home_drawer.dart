@@ -6,6 +6,7 @@ import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
 
 import '../../themes/color_schemes.dart';
+import '../../widgets/user_avatar.dart';
 
 class HomeDrawer extends ConsumerStatefulWidget {
   const HomeDrawer({super.key});
@@ -14,7 +15,7 @@ class HomeDrawer extends ConsumerStatefulWidget {
   ConsumerState<HomeDrawer> createState() => _HomeDrawerState();
 }
 
-class _HomeDrawerState extends ConsumerState<HomeDrawer> 
+class _HomeDrawerState extends ConsumerState<HomeDrawer>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
@@ -32,18 +33,13 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(-1.0, 0.0),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    ));
+    ).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
     // Start animation when drawer opens with a small delay
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -87,27 +83,25 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
                     ),
                     child: Column(
                       children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.white,
-                          child: CircleAvatar(
-                            radius: 38,
-                            backgroundImage: NetworkImage(
-                              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-                            ),
-                          ),
+                        // User Avatar using reusable widget
+                        UserAvatar(
+                          radius: 38,
+                          borderRadius: 40,
+                          borderColor: Colors.white,
+                          borderWidth: 2,
                         ),
                         16.height,
-                        Text(
-                          'Nimbrung User',
+                        // User Name using reusable widget
+                        UserDisplayName(
+                          preferUsername: false, // Prefer fullname for drawer
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          'user@nimbrung.com',
+                        // User Email using reusable widget
+                        UserEmail(
                           style: TextStyle(
                             color: AppColors.secondary,
                             fontSize: 14,
@@ -117,60 +111,110 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
                     ),
                   ),
                 ),
-                
+
                 // Menu Items with staggered animations
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.symmetric(vertical: 16),
                     children: [
-                      _buildAnimatedMenuItem(0, 'assets/images/home.svg', 'Beranda', () {
-                        Navigator.pop(context);
-                        context.go('/home');
-                      }),
-                      _buildAnimatedMenuItem(1, 'assets/images/book.svg', 'Perpustakaan', () {
-                        Navigator.pop(context);
-                        context.go('/library');
-                      }),
-                      _buildAnimatedMenuItem(2, 'assets/images/search.svg', 'Pencarian', () {
-                        Navigator.pop(context);
-                        context.go('/search');
-                      }),
-                      _buildAnimatedMenuItem(3, 'assets/images/chat.svg', 'Pesan', () {
-                        Navigator.pop(context);
-                        context.go('/home/chat');
-                      }),
-                      _buildAnimatedMenuItem(4, 'assets/images/user.svg', 'Profile', () {
-                        Navigator.pop(context);
-                        context.go('/profile');
-                      }),
-                      _buildAnimatedMenuItem(5, 'assets/images/security.svg', 'Pengaturan', () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Pengaturan akan segera tersedia')),
-                        );
-                      }),
-                      
+                      _buildAnimatedMenuItem(
+                        0,
+                        'assets/images/home.svg',
+                        'Beranda',
+                        () {
+                          Navigator.pop(context);
+                          context.go('/home');
+                        },
+                      ),
+                      _buildAnimatedMenuItem(
+                        1,
+                        'assets/images/book.svg',
+                        'Perpustakaan',
+                        () {
+                          Navigator.pop(context);
+                          context.go('/library');
+                        },
+                      ),
+                      _buildAnimatedMenuItem(
+                        2,
+                        'assets/images/search.svg',
+                        'Pencarian',
+                        () {
+                          Navigator.pop(context);
+                          context.go('/search');
+                        },
+                      ),
+                      _buildAnimatedMenuItem(
+                        3,
+                        'assets/images/chat.svg',
+                        'Pesan',
+                        () {
+                          Navigator.pop(context);
+                          context.go('/home/chat');
+                        },
+                      ),
+                      _buildAnimatedMenuItem(
+                        4,
+                        'assets/images/user.svg',
+                        'Profile',
+                        () {
+                          Navigator.pop(context);
+                          context.go('/profile');
+                        },
+                      ),
+                      _buildAnimatedMenuItem(
+                        5,
+                        'assets/images/security.svg',
+                        'Pengaturan',
+                        () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Pengaturan akan segera tersedia'),
+                            ),
+                          );
+                        },
+                      ),
+
                       FadeTransition(
                         opacity: _fadeAnimation,
                         child: Divider(color: Colors.grey[300], height: 32),
                       ),
-                      
-                      _buildAnimatedMenuItem(6, 'assets/images/share.svg', 'Bagikan Aplikasi', () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Fitur bagikan akan segera tersedia')),
-                        );
-                      }),
-                      _buildAnimatedMenuItem(7, Icons.help_outline, 'Bantuan', () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Halaman bantuan akan segera tersedia')),
-                        );
-                      }),
+
+                      _buildAnimatedMenuItem(
+                        6,
+                        'assets/images/share.svg',
+                        'Bagikan Aplikasi',
+                        () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Fitur bagikan akan segera tersedia',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildAnimatedMenuItem(
+                        7,
+                        Icons.help_outline,
+                        'Bantuan',
+                        () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Halaman bantuan akan segera tersedia',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
-                
+
                 // Logout Button with animation
                 SlideTransition(
                   position: _slideAnimation,
@@ -224,11 +268,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
       position: _slideAnimation,
       child: FadeTransition(
         opacity: _fadeAnimation,
-        child: _buildMenuItem(
-          icon: icon,
-          title: title,
-          onTap: onTap,
-        ),
+        child: _buildMenuItem(icon: icon, title: title, onTap: onTap),
       ),
     );
   }
@@ -247,21 +287,18 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
             color: AppColors.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: icon is String
-              ? SvgPicture.asset(
-                  icon,
-                  width: 20,
-                  height: 20,
-                  colorFilter: ColorFilter.mode(
-                    AppColors.primary,
-                    BlendMode.srcIn,
-                  ),
-                )
-              : Icon(
-                  icon,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
+          child:
+              icon is String
+                  ? SvgPicture.asset(
+                    icon,
+                    width: 20,
+                    height: 20,
+                    colorFilter: ColorFilter.mode(
+                      AppColors.primary,
+                      BlendMode.srcIn,
+                    ),
+                  )
+                  : Icon(icon, color: AppColors.primary, size: 20),
         ),
         title: Text(
           title,
@@ -272,9 +309,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
           ),
         ),
         onTap: onTap,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         hoverColor: AppColors.primary.withOpacity(0.05),
       ),
     );
@@ -298,10 +333,7 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
                 Navigator.of(context).pop(); // Close drawer
                 ref.read(appAuthNotifierProvider.notifier).logout();
               },
-              child: Text(
-                'Keluar',
-                style: TextStyle(color: AppColors.danger),
-              ),
+              child: Text('Keluar', style: TextStyle(color: AppColors.danger)),
             ),
           ],
         );

@@ -19,7 +19,7 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> 
+class _HomePageState extends ConsumerState<HomePage>
     with TickerProviderStateMixin {
   late AnimationController _drawerAnimationController;
   late Animation<double> _scaleAnimation;
@@ -33,21 +33,19 @@ class _HomePageState extends ConsumerState<HomePage>
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.85,
-    ).animate(CurvedAnimation(
-      parent: _drawerAnimationController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.85).animate(
+      CurvedAnimation(
+        parent: _drawerAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
 
-    _borderRadiusAnimation = Tween<double>(
-      begin: 0.0,
-      end: 20.0,
-    ).animate(CurvedAnimation(
-      parent: _drawerAnimationController,
-      curve: Curves.easeInOut,
-    ));
+    _borderRadiusAnimation = Tween<double>(begin: 0.0, end: 20.0).animate(
+      CurvedAnimation(
+        parent: _drawerAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   @override
@@ -85,7 +83,9 @@ class _HomePageState extends ConsumerState<HomePage>
                   boxShadow: [
                     if (_drawerAnimationController.value > 0)
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2 * _drawerAnimationController.value),
+                        color: Colors.black.withOpacity(
+                          0.2 * _drawerAnimationController.value,
+                        ),
                         blurRadius: 20,
                         spreadRadius: 5,
                       ),
@@ -137,7 +137,8 @@ class _HomePageState extends ConsumerState<HomePage>
                                       ),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         // Main content
                                         Text(
@@ -165,7 +166,9 @@ class _HomePageState extends ConsumerState<HomePage>
                                         Text(
                                           'Solso, R. L. (2008). Cognitive Psychology: Edisi Kedelapan. Erlangga.',
                                           style: TextStyle(
-                                            color: Colors.white.withOpacity(0.8),
+                                            color: Colors.white.withOpacity(
+                                              0.8,
+                                            ),
                                             fontSize: 12,
                                             fontStyle: FontStyle.italic,
                                           ),
@@ -179,7 +182,9 @@ class _HomePageState extends ConsumerState<HomePage>
                                               child: GestureDetector(
                                                 onTap: () {
                                                   // Navigate to nested discussion route
-                                                  context.go('/home/discussion');
+                                                  context.go(
+                                                    '/home/discussion',
+                                                  );
                                                 },
                                                 child: Container(
                                                   padding: EdgeInsets.symmetric(
@@ -188,14 +193,19 @@ class _HomePageState extends ConsumerState<HomePage>
                                                   ),
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
-                                                    borderRadius: BorderRadius.circular(12),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
                                                   ),
                                                   child: Center(
                                                     child: Text(
                                                       'Diskusikan',
                                                       style: TextStyle(
-                                                        color: AppColors.primary,
-                                                        fontWeight: FontWeight.w600,
+                                                        color:
+                                                            AppColors.primary,
+                                                        fontWeight:
+                                                            FontWeight.w600,
                                                         fontSize: 16,
                                                       ),
                                                     ),
@@ -224,7 +234,8 @@ class _HomePageState extends ConsumerState<HomePage>
                                                 shape: BoxShape.circle,
                                               ),
                                               child: Icon(
-                                                Icons.thumb_down_off_alt_rounded,
+                                                Icons
+                                                    .thumb_down_off_alt_rounded,
                                                 color: AppColors.primary,
                                                 size: 22,
                                               ),
