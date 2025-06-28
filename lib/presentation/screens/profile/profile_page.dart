@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
-import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
 import 'package:nimbrung_mobile/presentation/widgets/user_avatar.dart';
+import 'package:nimbrung_mobile/presentation/screens/settings/settings_page.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -135,9 +135,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            _showSettingsBottomSheet();
-          },
+          onTap: () => context.pushNamed(RouteNames.settings),
           borderRadius: BorderRadius.circular(50),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -583,142 +581,5 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
         );
       },
     );
-  }
-
-  void _showSettingsBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder:
-          (context) => Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Handle bar
-                  Container(
-                    margin: const EdgeInsets.only(top: 8),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Settings title
-                  Text(
-                    'Pengaturan',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Settings options
-                  ListTile(
-                    leading: const Icon(Icons.edit, color: AppColors.primary),
-                    title: const Text('Edit Profil'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      // Navigate to edit profile
-                    },
-                  ),
-
-                  ListTile(
-                    leading: const Icon(
-                      Icons.notifications,
-                      color: AppColors.primary,
-                    ),
-                    title: const Text('Notifikasi'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      // Navigate to notification settings
-                    },
-                  ),
-
-                  ListTile(
-                    leading: const Icon(Icons.help, color: AppColors.primary),
-                    title: const Text('Bantuan'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      // Navigate to help
-                    },
-                  ),
-
-                  const Divider(),
-
-                  // Logout option
-                  ListTile(
-                    leading: const Icon(Icons.logout, color: Colors.red),
-                    title: const Text(
-                      'Keluar',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showLogoutDialog();
-                    },
-                  ),
-
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ),
-    );
-  }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Konfirmasi Keluar'),
-            content: const Text(
-              'Apakah Anda yakin ingin keluar dari aplikasi?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Batal'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _logout();
-                },
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text('Keluar'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  Future<void> _logout() async {
-    // Show loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    // Perform logout
-    await ref.read(appAuthNotifierProvider.notifier).logout();
-
-    // Navigation will be handled by auth state listener in splash/main
-    if (mounted) {
-      context.goNamed(RouteNames.login);
-      // Navigator.of(context).popUntil((route) => route.isFirst);
-    }
   }
 }

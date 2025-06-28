@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
 
+import '../../routes/route_name.dart';
 import '../../themes/color_schemes.dart';
 import '../../widgets/user_avatar.dart';
 
@@ -330,8 +331,8 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.of(context).pop(); // Close drawer
-                ref.read(appAuthNotifierProvider.notifier).logout();
+
+                _logout();
               },
               child: Text('Keluar', style: TextStyle(color: AppColors.danger)),
             ),
@@ -339,5 +340,23 @@ class _HomeDrawerState extends ConsumerState<HomeDrawer>
         );
       },
     );
+  }
+
+  Future<void> _logout() async {
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    // Perform logout
+    await ref.read(appAuthNotifierProvider.notifier).logout();
+
+    // Navigation will be handled by auth state listener in splash/main
+    if (mounted) {
+      context.goNamed(RouteNames.login);
+      // Navigator.of(context).popUntil((route) => route.isFirst);
+    }
   }
 }

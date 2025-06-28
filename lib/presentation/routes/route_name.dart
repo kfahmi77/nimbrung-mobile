@@ -13,4 +13,5 @@ class RouteNames {
   static const String detailReading = 'detail-reading';
   static const String chatList = 'chat-list';
   static const String chatDetail = 'chat-detail';
+  static const String settings = 'settings';
 }

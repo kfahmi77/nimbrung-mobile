@@ -14,6 +14,7 @@ import '../screens/register_update/register_update_page.dart';
 import '../screens/search/search_page.dart';
 import '../screens/chat/chat_list_page.dart';
 import '../screens/chat/chat_page.dart';
+import '../screens/settings/settings_page.dart';
 import 'route_name.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -185,6 +186,17 @@ final GoRouter appRouter = GoRouter(
           print('Current location: ${state.uri}');
         }
         return const ReadingReviewDetailScreen();
+      },
+    ),
+    GoRoute(
+      path: '/settings',
+      name: RouteNames.settings,
+      builder: (context, state) {
+        if (kDebugMode) {
+          print('Navigating to settings');
+          print('Current location: ${state.uri}');
+        }
+        return const SettingsPage();
       },
     ),
   ],
