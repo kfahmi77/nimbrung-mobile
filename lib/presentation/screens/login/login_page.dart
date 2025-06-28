@@ -4,11 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nimbrung_mobile/presentation/extension/snackbar_extension.dart';
 import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 import 'package:nimbrung_mobile/features/auth/auth.dart';
 import 'package:nimbrung_mobile/features/auth/presentation/notifiers/app_auth_notifier.dart';
+import 'package:nimbrung_mobile/presentation/widgets/custom_snackbar.dart';
 
 import '../../widgets/buttons/custom_google_button.dart';
 import '../../widgets/buttons/custom_primary_button.dart';
@@ -53,15 +55,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     // Listen to login state for UI feedback
     ref.listen<LoginState>(loginNotifierProvider, (previous, next) {
       if (next is LoginSuccess) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login berhasil!'),
-            backgroundColor: Colors.green,
-          ),
+        context.showCustomSnackbar(
+          message: 'Login successful!',
+          type: SnackbarType.success,
         );
+        // Optionally navigate to home or another page
+        context.go('/home');
       } else if (next is LoginFailure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.message), backgroundColor: Colors.red),
+        context.showCustomSnackbar(
+          message: next.message,
+          type: SnackbarType.error,
         );
       }
     });

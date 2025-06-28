@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
+import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
 
@@ -710,7 +712,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
 
     // Navigation will be handled by auth state listener in splash/main
     if (mounted) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      context.goNamed(RouteNames.login);
+      // Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 }

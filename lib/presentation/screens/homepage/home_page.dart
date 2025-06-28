@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
 import '../../themes/color_schemes.dart';
-import '../../../features/daily-readings/presentation/screens/widgets/appbar.dart';
+import 'appbar.dart';
 import '../../../features/daily-readings/presentation/screens/widgets/resension.dart';
 import '../../widgets/chat_bot_avatar.dart';
 
