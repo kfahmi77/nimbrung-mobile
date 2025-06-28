@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/usecases/usecase.dart';
-import '../entities/user.dart';
+import '../../../user/domain/entities/user.dart';
 import '../repositories/auth_repository.dart';
 
 class LoginUseCase implements UseCase<User, LoginParams> {

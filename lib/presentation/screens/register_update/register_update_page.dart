@@ -7,7 +7,11 @@ import 'package:nimbrung_mobile/presentation/widgets/custom_date_form_field.dart
 import 'package:nimbrung_mobile/presentation/widgets/custom_drop_down_field.dart';
 import 'package:nimbrung_mobile/presentation/widgets/enhanced_profile_photo_picker.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
-import 'package:nimbrung_mobile/features/auth/auth.dart';
+import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
+import 'package:nimbrung_mobile/features/auth/presentation/notifiers/app_auth_notifier.dart';
+import 'package:nimbrung_mobile/features/user/presentation/providers/user_providers.dart';
+import 'package:nimbrung_mobile/features/user/presentation/state/user_state.dart';
+import 'package:nimbrung_mobile/features/user/domain/entities/preference.dart';
 import 'dart:io';
 
 import '../../widgets/custom_text_field.dart';
@@ -36,7 +40,7 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
     super.initState();
     // Load current user when page opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(currentUserNotifierProvider.notifier).getCurrentUser();
+      // Get current user from auth state instead of separate provider
     });
   }
 
@@ -50,23 +54,21 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final profileUpdateState = ref.watch(
-      profileUpdateWithImageNotifierProvider,
-    );
-    final currentUserState = ref.watch(currentUserNotifierProvider);
+    final userProfileState = ref.watch(userProfileNotifierProvider);
+    final authState = ref.watch(appAuthNotifierProvider);
 
-    // Listen to profile update state changes
-    ref.listen<ProfileUpdateState>(profileUpdateWithImageNotifierProvider, (
-      previous,
-      next,
-    ) {
-      if (next is ProfileUpdateSuccess) {
+    // Listen to user profile state changes
+    ref.listen<UserState>(userProfileNotifierProvider, (previous, next) {
+      if (next is UserLoaded) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.message), backgroundColor: Colors.green),
+          const SnackBar(
+            content: Text('Profile updated successfully'),
+            backgroundColor: Colors.green,
+          ),
         );
         // Navigate to home page
         context.go('/home');
-      } else if (next is ProfileUpdateFailure) {
+      } else if (next is UserError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(next.message), backgroundColor: Colors.red),
         );
@@ -163,9 +165,9 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                             });
                           },
                           initialImageUrl:
-                              currentUserState is CurrentUserLoaded &&
-                                      currentUserState.user != null
-                                  ? currentUserState.user!.avatar
+                              authState is AppAuthAuthenticated &&
+                                      authState.user.avatar != null
+                                  ? authState.user.avatar
                                   : null,
                         ),
                       ),
@@ -310,7 +312,7 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                           minimumSize: const Size(double.infinity, 50),
                         ),
                         onPressed:
-                            profileUpdateState is ProfileUpdateLoading
+                            userProfileState is UserLoading
                                 ? null
                                 : () async {
                                   if (_formKey.currentState!.validate()) {
@@ -327,11 +329,10 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                                       return;
                                     }
 
-                                    // Get current user from state
+                                    // Get current user from auth state
                                     String? currentUserId;
-                                    if (currentUserState is CurrentUserLoaded &&
-                                        currentUserState.user != null) {
-                                      currentUserId = currentUserState.user!.id;
+                                    if (authState is AppAuthAuthenticated) {
+                                      currentUserId = authState.user.id;
                                     }
 
                                     if (currentUserId == null) {
@@ -392,34 +393,30 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                                       }
                                     }
 
-                                    // Call profile update method with image
-                                    await ref
-                                        .read(
-                                          profileUpdateWithImageNotifierProvider
-                                              .notifier,
-                                        )
-                                        .updateProfileWithImage(
-                                          userId: currentUserId,
-                                          bio: _bioController.text.trim(),
-                                          birthPlace:
-                                              _placeController.text.trim(),
-                                          dateBirth: dateBirth,
-                                          preferenceId: _selectedPreferenceId,
-                                          avatarFile: _selectedAvatarFile,
-                                          existingAvatarUrl:
-                                              currentUserState
-                                                          is CurrentUserLoaded &&
-                                                      currentUserState.user !=
-                                                          null
-                                                  ? currentUserState
-                                                      .user!
-                                                      .avatar
-                                                  : null,
-                                        );
+                                    // Call profile update method first
+                                    final notifier = ref.read(
+                                      userProfileNotifierProvider.notifier,
+                                    );
+
+                                    await notifier.updateProfile(
+                                      userId: currentUserId,
+                                      bio: _bioController.text.trim(),
+                                      birthPlace: _placeController.text.trim(),
+                                      dateBirth: dateBirth,
+                                      preferenceId: _selectedPreferenceId,
+                                    );
+
+                                    // If avatar is selected, update it separately
+                                    if (_selectedAvatarFile != null) {
+                                      await notifier.updateAvatar(
+                                        userId: currentUserId,
+                                        avatarPath: _selectedAvatarFile!.path,
+                                      );
+                                    }
                                   }
                                 },
                         child: Text(
-                          profileUpdateState is ProfileUpdateLoading
+                          userProfileState is UserLoading
                               ? 'Memperbarui...'
                               : 'Selesai',
                           style: TextStyle(

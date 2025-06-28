@@ -6,7 +6,6 @@ import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 import 'package:nimbrung_mobile/presentation/widgets/user_avatar.dart';
-import 'package:nimbrung_mobile/presentation/screens/settings/settings_page.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});

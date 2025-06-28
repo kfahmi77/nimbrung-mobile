@@ -3,7 +3,7 @@ import '../../../../core/utils/logger.dart';
 import '../../domain/usecases/get_current_user.dart';
 import '../../domain/usecases/logout.dart';
 import '../../../../core/usecases/usecase.dart';
-import '../../domain/entities/user.dart';
+import '../../../user/domain/entities/user.dart';
 
 /// Authentication state for the entire app
 abstract class AppAuthState {

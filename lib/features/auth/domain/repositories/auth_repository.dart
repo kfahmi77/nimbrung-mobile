@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
-import '../entities/user.dart';
-import '../entities/preference.dart';
+import '../../../user/domain/entities/user.dart';
 
 abstract class AuthRepository {
   /// Authentication methods
@@ -23,23 +22,6 @@ abstract class AuthRepository {
   Future<Either<Failure, User?>> getCurrentUser();
 
   Future<Either<Failure, bool>> isLoggedIn();
-
-  /// Profile methods
-  Future<Either<Failure, User>> getUserProfile(String userId);
-
-  Future<Either<Failure, User>> updateProfile({
-    required String userId,
-    String? bio,
-    String? birthPlace,
-    DateTime? dateBirth,
-    String? preferenceId,
-    String? avatar,
-  });
-
-  /// Preference methods
-  Future<Either<Failure, List<Preference>>> getPreferences();
-
-  Future<Either<Failure, Preference>> createPreference(String preferenceName);
 
   /// Password reset
   Future<Either<Failure, void>> resetPassword(String email);

@@ -1,8 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/logger.dart';
-import '../../domain/entities/user.dart';
-import '../../domain/entities/preference.dart';
+import '../../../user/domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
 
@@ -101,84 +100,6 @@ class AuthRepositoryImpl implements AuthRepository {
         error: e,
       );
       return Left(AuthFailure(message: e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, User>> getUserProfile(String userId) async {
-    try {
-      final result = await remoteDataSource.getUserProfile(userId);
-      return Right(result.toEntity());
-    } catch (e) {
-      AppLogger.error(
-        'Repository: Get user profile failed',
-        tag: 'AuthRepository',
-        error: e,
-      );
-      return Left(DatabaseFailure(message: e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, User>> updateProfile({
-    required String userId,
-    String? bio,
-    String? birthPlace,
-    DateTime? dateBirth,
-    String? preferenceId,
-    String? avatar,
-  }) async {
-    try {
-      final result = await remoteDataSource.updateProfile(
-        userId: userId,
-        bio: bio,
-        birthPlace: birthPlace,
-        dateBirth: dateBirth,
-        preferenceId: preferenceId,
-        avatar: avatar,
-      );
-      return Right(result.toEntity());
-    } catch (e) {
-      AppLogger.error(
-        'Repository: Update profile failed',
-        tag: 'AuthRepository',
-        error: e,
-      );
-      return Left(DatabaseFailure(message: e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, List<Preference>>> getPreferences() async {
-    try {
-      final result = await remoteDataSource.getPreferences();
-      // Convert PreferenceModel list to Preference entity list
-      final preferences = result.map((model) => model.toEntity()).toList();
-      return Right(preferences);
-    } catch (e) {
-      AppLogger.error(
-        'Repository: Get preferences failed',
-        tag: 'AuthRepository',
-        error: e,
-      );
-      return Left(DatabaseFailure(message: e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, Preference>> createPreference(
-    String preferenceName,
-  ) async {
-    try {
-      final result = await remoteDataSource.createPreference(preferenceName);
-      return Right(result.toEntity());
-    } catch (e) {
-      AppLogger.error(
-        'Repository: Create preference failed',
-        tag: 'AuthRepository',
-        error: e,
-      );
-      return Left(DatabaseFailure(message: e.toString()));
     }
   }
 

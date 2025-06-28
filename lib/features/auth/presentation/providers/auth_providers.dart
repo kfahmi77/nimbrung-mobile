@@ -6,34 +6,15 @@ import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/login.dart';
 import '../../domain/usecases/register.dart';
 import '../../domain/usecases/logout.dart';
-import '../../domain/usecases/update_profile.dart';
 import '../../domain/usecases/get_current_user.dart';
-import '../../domain/usecases/get_preferences.dart';
 import '../notifiers/login_notifier.dart';
 import '../notifiers/register_notifier.dart';
-import '../notifiers/profile_update_notifier.dart';
-import '../notifiers/profile_update_with_image_notifier.dart';
-import '../notifiers/current_user_notifier.dart';
 import '../notifiers/app_auth_notifier.dart';
 import '../state/auth_state.dart';
-import '../../domain/entities/preference.dart';
-import '../../../../core/usecases/usecase.dart';
-import '../../../../core/services/image_upload_service.dart';
-import '../../data/services/auth_image_service.dart';
 
 // Data Sources
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   return AuthRemoteDataSourceImpl();
-});
-
-// Image Services
-final imageUploadServiceProvider = Provider<ImageUploadService>((ref) {
-  return ImageUploadService();
-});
-
-final authImageServiceProvider = Provider<AuthImageService>((ref) {
-  final imageUploadService = ref.watch(imageUploadServiceProvider);
-  return AuthImageService(imageUploadService: imageUploadService);
 });
 
 // Repositories
@@ -58,19 +39,9 @@ final logoutUseCaseProvider = Provider<LogoutUseCase>((ref) {
   return LogoutUseCase(repository);
 });
 
-final updateProfileUseCaseProvider = Provider<UpdateProfileUseCase>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
-  return UpdateProfileUseCase(repository);
-});
-
 final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return GetCurrentUserUseCase(repository);
-});
-
-final getPreferencesUseCaseProvider = Provider<GetPreferencesUseCase>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
-  return GetPreferencesUseCase(repository);
 });
 
 // Notifiers/StateNotifiers
@@ -87,29 +58,7 @@ final registerNotifierProvider =
       return RegisterNotifier(registerUseCase: registerUseCase, ref: ref);
     });
 
-final profileUpdateNotifierProvider =
-    StateNotifierProvider<ProfileUpdateNotifier, ProfileUpdateState>((ref) {
-      final updateProfileUseCase = ref.watch(updateProfileUseCaseProvider);
-      return ProfileUpdateNotifier(updateProfileUseCase: updateProfileUseCase);
-    });
-
-final profileUpdateWithImageNotifierProvider =
-    StateNotifierProvider<ProfileUpdateWithImageNotifier, ProfileUpdateState>((
-      ref,
-    ) {
-      final updateProfileUseCase = ref.watch(updateProfileUseCaseProvider);
-      final authImageService = ref.watch(authImageServiceProvider);
-      return ProfileUpdateWithImageNotifier(
-        updateProfileUseCase: updateProfileUseCase,
-        authImageService: authImageService,
-      );
-    });
-
-final currentUserNotifierProvider =
-    StateNotifierProvider<CurrentUserNotifier, CurrentUserState>((ref) {
-      final getCurrentUserUseCase = ref.watch(getCurrentUserUseCaseProvider);
-      return CurrentUserNotifier(getCurrentUserUseCase: getCurrentUserUseCase);
-    });
+// User-related providers have been moved to lib/features/user/presentation/providers/user_providers.dart
 
 // App-wide authentication provider
 final appAuthNotifierProvider =
@@ -122,16 +71,7 @@ final appAuthNotifierProvider =
       );
     });
 
-// Additional providers
-final preferencesProvider = FutureProvider<List<Preference>>((ref) async {
-  final getPreferencesUseCase = ref.watch(getPreferencesUseCaseProvider);
-  final result = await getPreferencesUseCase(NoParams());
-
-  return result.fold(
-    (failure) => throw Exception(failure.message),
-    (preferences) => preferences,
-  );
-});
+// Preferences provider has been moved to lib/features/user/presentation/providers/user_providers.dart
 
 final isLoggedInProvider = FutureProvider<bool>((ref) async {
   final repository = ref.watch(authRepositoryProvider);
