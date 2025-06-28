@@ -11,6 +11,7 @@ class User extends Equatable {
   final String? birthPlace;
   final bool isPremium;
   final String? preferenceId;
+  final String? preferenceName; // Added preference name from joined table
   final DateTime createdAt;
   final DateTime? updatedAt;
   final String role;
@@ -29,6 +30,7 @@ class User extends Equatable {
     this.birthPlace,
     this.isPremium = false,
     this.preferenceId,
+    this.preferenceName, // Added preference name
     required this.createdAt,
     this.updatedAt,
     this.role = 'user',
@@ -49,6 +51,7 @@ class User extends Equatable {
     birthPlace,
     isPremium,
     preferenceId,
+    preferenceName, // Added preference name
     createdAt,
     updatedAt,
     role,
@@ -68,6 +71,7 @@ class User extends Equatable {
     String? birthPlace,
     bool? isPremium,
     String? preferenceId,
+    String? preferenceName, // Added preference name
     DateTime? createdAt,
     DateTime? updatedAt,
     String? role,
@@ -86,6 +90,8 @@ class User extends Equatable {
       birthPlace: birthPlace ?? this.birthPlace,
       isPremium: isPremium ?? this.isPremium,
       preferenceId: preferenceId ?? this.preferenceId,
+      preferenceName:
+          preferenceName ?? this.preferenceName, // Added preference name
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       role: role ?? this.role,

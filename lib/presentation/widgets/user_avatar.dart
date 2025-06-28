@@ -115,3 +115,174 @@ class UserEmail extends ConsumerWidget {
     return Text(email, style: style);
   }
 }
+
+/// A reusable widget for displaying user bio
+class UserBio extends ConsumerWidget {
+  final TextStyle? style;
+  final String? fallbackBio;
+  final int? maxLines;
+  final TextOverflow? overflow;
+
+  const UserBio({
+    super.key,
+    this.style,
+    this.fallbackBio,
+    this.maxLines,
+    this.overflow,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(appAuthNotifierProvider);
+
+    String bio;
+    if (authState is AppAuthAuthenticated) {
+      bio =
+          authState.user.bio ??
+          fallbackBio ??
+          'Belum ada bio yang ditambahkan.';
+    } else {
+      bio = fallbackBio ?? 'Belum ada bio yang ditambahkan.';
+    }
+
+    return Text(bio, style: style, maxLines: maxLines, overflow: overflow);
+  }
+}
+
+/// A reusable widget for displaying user preference name
+/// Uses the preferenceName field from the joined preference table
+class UserPreference extends ConsumerWidget {
+  final TextStyle? style;
+  final String? fallbackPreference;
+
+  const UserPreference({super.key, this.style, this.fallbackPreference});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(appAuthNotifierProvider);
+
+    String preference;
+    if (authState is AppAuthAuthenticated) {
+      // Use the preferenceName field from the joined table
+      preference =
+          authState.user.preferenceName ?? fallbackPreference ?? 'Psikologi';
+    } else {
+      preference = fallbackPreference ?? 'Psikologi';
+    }
+
+    return Text(preference, style: style);
+  }
+}
+
+/// A comprehensive widget that displays user information
+/// Combines avatar, name, email, bio, and preference in a customizable layout
+class UserInfoCard extends ConsumerWidget {
+  final bool showAvatar;
+  final bool showName;
+  final bool showEmail;
+  final bool showBio;
+  final bool showPreference;
+  final double? avatarRadius;
+  final TextStyle? nameStyle;
+  final TextStyle? emailStyle;
+  final TextStyle? bioStyle;
+  final TextStyle? preferenceStyle;
+  final CrossAxisAlignment? alignment;
+  final MainAxisSize? mainAxisSize;
+  final EdgeInsetsGeometry? padding;
+  final String? fallbackBio;
+  final String? fallbackPreference;
+
+  const UserInfoCard({
+    super.key,
+    this.showAvatar = true,
+    this.showName = true,
+    this.showEmail = true,
+    this.showBio = true,
+    this.showPreference = true,
+    this.avatarRadius = 40,
+    this.nameStyle,
+    this.emailStyle,
+    this.bioStyle,
+    this.preferenceStyle,
+    this.alignment = CrossAxisAlignment.center,
+    this.mainAxisSize = MainAxisSize.min,
+    this.padding,
+    this.fallbackBio,
+    this.fallbackPreference,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: alignment!,
+        mainAxisSize: mainAxisSize!,
+        children: [
+          // Avatar
+          if (showAvatar) ...[
+            UserAvatar(
+              radius: avatarRadius!,
+              borderColor: Colors.white,
+              borderWidth: 2,
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Name
+          if (showName) ...[
+            UserDisplayName(
+              preferUsername: false,
+              style:
+                  nameStyle ??
+                  const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+            ),
+            const SizedBox(height: 8),
+          ],
+
+          // Email
+          if (showEmail) ...[
+            UserEmail(
+              style:
+                  emailStyle ??
+                  TextStyle(fontSize: 16, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 8),
+          ],
+
+          // Preference
+          if (showPreference) ...[
+            UserPreference(
+              fallbackPreference: fallbackPreference,
+              style:
+                  preferenceStyle ??
+                  TextStyle(
+                    fontSize: 14,
+                    color: Colors.blue[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Bio
+          if (showBio) ...[
+            UserBio(
+              fallbackBio: fallbackBio,
+              style:
+                  bioStyle ??
+                  TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.5),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

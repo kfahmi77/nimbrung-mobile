@@ -6,6 +6,7 @@ import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
+import 'package:nimbrung_mobile/presentation/widgets/user_avatar.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -266,9 +267,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   ],
                 ),
                 child: ClipOval(
-                  child: Image.network(
-                    'https://raw.githubusercontent.com/kfahmi77/api-mockup-nimbrung/refs/heads/main/Image-141.png',
-                    fit: BoxFit.cover,
+                  child: UserAvatar(
+                    radius: profileSize / 2,
+                    fallbackImageUrl:
+                        'https://raw.githubusercontent.com/kfahmi77/api-mockup-nimbrung/refs/heads/main/Image-141.png',
                   ),
                 ),
               ),
@@ -291,9 +293,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
             child: Center(
               child: Column(
                 children: [
-                  const Text(
-                    'Karien Zain',
-                    style: TextStyle(
+                  UserDisplayName(
+                    preferUsername: false, // Prefer fullname for profile
+                    fallbackText: 'Karien Zain',
+                    style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -309,8 +312,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                       color: AppColors.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(
-                      'Psikologi',
+                    child: UserPreference(
+                      fallbackPreference: 'Psikologi',
                       style: TextStyle(
                         fontSize: 16,
                         color: AppColors.primary,
@@ -406,14 +409,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   ),
                   16.height,
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.grey[50],
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.grey[200]!, width: 1),
                     ),
-                    child: Text(
-                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet urna eget tortor rutrum cursus. Curabitur a mi leo. Aenean nec efficitur lacus. Aliquam pellentesque eu orci sed efficitur. Sed sagittis pretium odio eu condimentum. Mauris eu urna eget ante mollis pharetra dignissim id lorem.',
+                    child: UserBio(
+                      fallbackBio:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sit amet urna eget tortor rutrum cursus. Curabitur a mi leo. Aenean nec efficitur lacus. Aliquam pellentesque eu orci sed efficitur. Sed sagittis pretium odio eu condimentum. Mauris eu urna eget ante mollis pharetra dignissim id lorem.',
                       style: TextStyle(
                         fontSize: 15,
                         color: Colors.grey[700],

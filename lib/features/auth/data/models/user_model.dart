@@ -12,6 +12,7 @@ class UserModel extends User {
     super.birthPlace,
     super.isPremium = false,
     super.preferenceId,
+    super.preferenceName,
     required super.createdAt,
     super.updatedAt,
     super.role = 'user',
@@ -32,6 +33,8 @@ class UserModel extends User {
       birthPlace: json['birth_place'] as String?,
       isPremium: json['is_premium'] as bool? ?? false,
       preferenceId: json['preference_id'] as String?,
+      preferenceName:
+          json['preference_name'] as String?, // Added preference name from join
       createdAt: _parseDateTime(json['created_at']) ?? DateTime.now(),
       updatedAt: _parseDateTime(json['updated_at']),
       role: json['role'] as String? ?? 'user',
@@ -53,6 +56,7 @@ class UserModel extends User {
       'birth_place': birthPlace,
       'is_premium': isPremium,
       'preference_id': preferenceId,
+      'preference_name': preferenceName, // Added preference name
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
       'role': role,
@@ -102,6 +106,7 @@ class UserModel extends User {
       birthPlace: birthPlace,
       isPremium: isPremium,
       preferenceId: preferenceId,
+      preferenceName: preferenceName, // Added preference name
       createdAt: createdAt,
       updatedAt: updatedAt,
       role: role,
@@ -123,6 +128,7 @@ class UserModel extends User {
     String? birthPlace,
     bool? isPremium,
     String? preferenceId,
+    String? preferenceName,
     DateTime? createdAt,
     DateTime? updatedAt,
     String? role,
@@ -141,6 +147,7 @@ class UserModel extends User {
       birthPlace: birthPlace ?? this.birthPlace,
       isPremium: isPremium ?? this.isPremium,
       preferenceId: preferenceId ?? this.preferenceId,
+      preferenceName: preferenceName ?? this.preferenceName,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       role: role ?? this.role,

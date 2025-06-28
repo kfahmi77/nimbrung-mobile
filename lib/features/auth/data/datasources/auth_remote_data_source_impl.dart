@@ -38,11 +38,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         tag: 'AuthRemoteDataSource',
       );
 
-      // Get user data from users table
+      // Get user data from users table with preference name
       final userData =
           await _supabase
               .from(SupabaseConfig.usersTable)
-              .select()
+              .select('''
+            *,
+            preferences(preferences_name)
+          ''')
               .eq('id', response.user!.id)
               .single();
 
@@ -55,7 +58,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         tag: 'AuthRemoteDataSource',
       );
 
-      return UserModel.fromJson(userData);
+      // Transform the joined data to include preference_name
+      final transformedUserData = Map<String, dynamic>.from(userData);
+      if (transformedUserData['preferences'] != null &&
+          transformedUserData['preferences']['preferences_name'] != null) {
+        transformedUserData['preference_name'] =
+            transformedUserData['preferences']['preferences_name'];
+      }
+      transformedUserData.remove('preferences'); // Remove the nested object
+
+      return UserModel.fromJson(transformedUserData);
     } on AuthException catch (e) {
       AppLogger.error(
         'Auth exception during login',
@@ -141,14 +153,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           await _supabase
               .from(SupabaseConfig.usersTable)
               .insert(userData)
-              .select()
+              .select('''
+            *,
+            preferences(preferences_name)
+          ''')
               .single();
 
       AppLogger.info(
         'User registration completed successfully',
         tag: 'AuthRemoteDataSource',
       );
-      return UserModel.fromJson(response);
+
+      // Transform the joined data to include preference_name
+      final transformedResponse = Map<String, dynamic>.from(response);
+      if (transformedResponse['preferences'] != null &&
+          transformedResponse['preferences']['preferences_name'] != null) {
+        transformedResponse['preference_name'] =
+            transformedResponse['preferences']['preferences_name'];
+      }
+      transformedResponse.remove('preferences'); // Remove the nested object
+
+      return UserModel.fromJson(transformedResponse);
     } on AuthException catch (e) {
       AppLogger.error(
         'Auth exception during registration',
@@ -230,7 +255,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final response =
           await _supabase
               .from(SupabaseConfig.usersTable)
-              .select()
+              .select('''
+            *,
+            preferences(preferences_name)
+          ''')
               .eq('id', userId)
               .single();
 
@@ -238,7 +266,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'User profile retrieved successfully',
         tag: 'AuthRemoteDataSource',
       );
-      return UserModel.fromJson(response);
+
+      // Transform the joined data to include preference_name
+      final userData = Map<String, dynamic>.from(response);
+      if (userData['preferences'] != null &&
+          userData['preferences']['preferences_name'] != null) {
+        userData['preference_name'] =
+            userData['preferences']['preferences_name'];
+      }
+      userData.remove('preferences'); // Remove the nested object
+
+      return UserModel.fromJson(userData);
     } catch (e) {
       AppLogger.error(
         'Failed to get user profile',
@@ -283,14 +321,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               .from(SupabaseConfig.usersTable)
               .update(updateData)
               .eq('id', userId)
-              .select()
+              .select('''
+            *,
+            preferences(preferences_name)
+          ''')
               .single();
 
       AppLogger.info(
         'Profile updated successfully for user: $userId',
         tag: 'AuthRemoteDataSource',
       );
-      return UserModel.fromJson(response);
+
+      // Transform the joined data to include preference_name
+      final transformedResponse = Map<String, dynamic>.from(response);
+      if (transformedResponse['preferences'] != null &&
+          transformedResponse['preferences']['preferences_name'] != null) {
+        transformedResponse['preference_name'] =
+            transformedResponse['preferences']['preferences_name'];
+      }
+      transformedResponse.remove('preferences'); // Remove the nested object
+
+      return UserModel.fromJson(transformedResponse);
     } on PostgrestException catch (e) {
       AppLogger.error(
         'Database error during profile update',
