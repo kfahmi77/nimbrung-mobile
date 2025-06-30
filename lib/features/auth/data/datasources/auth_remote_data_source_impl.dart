@@ -1,3 +1,4 @@
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/config/supabase_config.dart';
 import '../../../../core/utils/logger.dart';
@@ -8,7 +9,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final SupabaseClient _supabase = SupabaseConfig.instance;
 
   @override
-  Future<UserModel> login({
+  Future<UserModel> loginEmail({
     required String email,
     required String password,
   }) async {
@@ -329,6 +330,116 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         return 'Data tidak memenuhi kriteria yang diperlukan.';
       default:
         return 'Terjadi kesalahan pada server.';
+    }
+  }
+
+  @override
+  Future<UserModel> loginWithGoogle() async {
+    AppLogger.info(
+      'Starting Google login via native GoogleSignIn',
+      tag: 'AuthRemoteDataSource',
+    );
+    try {
+      // Ganti dengan client ID Anda dari Google Cloud Console
+      const webClientId =
+          '387210736422-ore6clv16248po3nut6rkdagkso8p9n2.apps.googleusercontent.com';
+      const iosClientId =
+          '387210736422-4hcag57tikmkh38q5sp6hurdrm3qh15n.apps.googleusercontent.com';
+
+      final googleSignIn = GoogleSignIn(serverClientId: webClientId);
+
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        AppLogger.warning(
+          'Google sign in aborted by user',
+          tag: 'AuthRemoteDataSource',
+        );
+        throw Exception('Login Google dibatalkan.');
+      }
+
+      final googleAuth = await googleUser.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+
+      if (accessToken == null || idToken == null) {
+        AppLogger.error(
+          'Missing Google Auth Token',
+          tag: 'AuthRemoteDataSource',
+        );
+        throw Exception('Token Google tidak ditemukan.');
+      }
+
+      final response = await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+
+      final user = response.user;
+      if (user == null) {
+        AppLogger.warning(
+          'Supabase login failed - user is null',
+          tag: 'AuthRemoteDataSource',
+        );
+        throw Exception('Login Google gagal. User tidak ditemukan.');
+      }
+
+      // Cek apakah user sudah ada di tabel users
+      final userData =
+          await _supabase
+              .from(SupabaseConfig.usersTable)
+              .select('*, preferences(preferences_name)')
+              .eq('id', user.id)
+              .maybeSingle();
+
+      if (userData == null) {
+        // Insert user baru ke tabel users
+        final insertData = {
+          'id': user.id,
+          'email': user.email,
+          'fullname': user.userMetadata?['full_name'] ?? user.email,
+          'avatar': user.userMetadata?['avatar_url'],
+          'is_profile_complete': false,
+          'preference_id': null,
+        };
+        final inserted =
+            await _supabase
+                .from(SupabaseConfig.usersTable)
+                .insert(insertData)
+                .select()
+                .single();
+        AppLogger.info(
+          'User baru Google berhasil diinsert',
+          tag: 'AuthRemoteDataSource',
+        );
+        return UserModel.fromJson(inserted);
+      } else {
+        // Transformasi data join
+        final transformedUserData = Map<String, dynamic>.from(userData);
+        if (transformedUserData['preferences'] != null &&
+            transformedUserData['preferences']['preferences_name'] != null) {
+          transformedUserData['preference_name'] =
+              transformedUserData['preferences']['preferences_name'];
+        }
+        transformedUserData.remove('preferences');
+        return UserModel.fromJson(transformedUserData);
+      }
+    } on AuthException catch (e) {
+      AppLogger.error(
+        'Auth exception during Google login',
+        tag: 'AuthRemoteDataSource',
+        error: e,
+      );
+      throw Exception(_getAuthErrorMessage(e));
+    } catch (e) {
+      AppLogger.error(
+        'Unexpected error during Google login',
+        tag: 'AuthRemoteDataSource',
+        error: e,
+      );
+      throw Exception(
+        'Terjadi kesalahan saat login Google. Silakan coba lagi.',
+      );
     }
   }
 }

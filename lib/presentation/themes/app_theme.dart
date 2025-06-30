@@ -25,4 +25,28 @@ class AppTheme {
     textTheme: appTextTheme,
     fontFamily: AppFonts.sourceSansPro,
   );
+  static ThemeData darkTheme = ThemeData(
+    primaryColor: AppColors.primary,
+    scaffoldBackgroundColor: Colors.black,
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.primary,
+      foregroundColor: AppColors.textOnPrimary,
+    ),
+    colorScheme: ColorScheme(
+      brightness: Brightness.dark,
+      primary: AppColors.primary,
+      onPrimary: AppColors.textOnPrimary,
+      secondary: AppColors.secondary,
+      onSecondary: AppColors.textPrimary,
+      error: AppColors.danger,
+      onError: Colors.white,
+      surface: Colors.black,
+      onSurface: AppColors.textPrimary,
+    ),
+    textTheme: appTextTheme.apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
+    ),
+    fontFamily: AppFonts.sourceSansPro,
+  );
 }

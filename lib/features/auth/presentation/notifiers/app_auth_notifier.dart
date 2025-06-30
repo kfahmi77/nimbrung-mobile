@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/logger.dart';
 import '../../domain/usecases/get_current_user.dart';
 import '../../domain/usecases/logout.dart';
+import '../../domain/usecases/login_with_google.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../../user/domain/entities/user.dart';
 
@@ -43,12 +44,15 @@ class AppAuthError extends AppAuthState {
 class AppAuthNotifier extends StateNotifier<AppAuthState> {
   final GetCurrentUserUseCase _getCurrentUserUseCase;
   final LogoutUseCase _logoutUseCase;
+  final LoginWithGoogleUseCase _loginWithGoogleUseCase;
 
   AppAuthNotifier({
     required GetCurrentUserUseCase getCurrentUserUseCase,
     required LogoutUseCase logoutUseCase,
+    required LoginWithGoogleUseCase loginWithGoogleUseCase,
   }) : _getCurrentUserUseCase = getCurrentUserUseCase,
        _logoutUseCase = logoutUseCase,
+       _loginWithGoogleUseCase = loginWithGoogleUseCase,
        super(const AppAuthInitial());
 
   /// Check authentication status on app startup
@@ -134,6 +138,39 @@ class AppAuthNotifier extends StateNotifier<AppAuthState> {
       );
       // Even if error occurs, clear local state
       state = const AppAuthUnauthenticated();
+    }
+  }
+
+  /// Login with Google (Supabase)
+  Future<void> loginWithGoogle() async {
+    try {
+      AppLogger.info('Login with Google started', tag: 'AppAuthNotifier');
+      state = const AppAuthLoading();
+      final result = await _loginWithGoogleUseCase(NoParams());
+      result.fold(
+        (failure) {
+          final msg = (failure as dynamic).message ?? 'Google login failed';
+          AppLogger.error(
+            'Google login failed: \u001b[31m$msg\u001b[0m',
+            tag: 'AppAuthNotifier',
+          );
+          state = AppAuthError(message: msg);
+        },
+        (user) {
+          AppLogger.info(
+            'Google login success: ${user.email}',
+            tag: 'AppAuthNotifier',
+          );
+          state = AppAuthAuthenticated(user: user);
+        },
+      );
+    } catch (e) {
+      AppLogger.error(
+        'Error during Google login: $e',
+        tag: 'AppAuthNotifier',
+        error: e,
+      );
+      state = AppAuthError(message: e.toString());
     }
   }
 

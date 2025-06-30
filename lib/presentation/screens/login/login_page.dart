@@ -232,7 +232,30 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                         24.height,
                         // Google Login Button
-                        const CustomGoogleButton(text: 'Masuk dengan Google'),
+                        Builder(
+                          builder: (context) {
+                            final appAuthState = ref.watch(
+                              appAuthNotifierProvider,
+                            );
+                            final isLoading = appAuthState is AppAuthLoading;
+                            return CustomGoogleButton(
+                              text:
+                                  isLoading
+                                      ? 'Memproses...'
+                                      : 'Masuk dengan Google',
+                              onPressed:
+                                  isLoading
+                                      ? null
+                                      : () async {
+                                        await ref
+                                            .read(
+                                              appAuthNotifierProvider.notifier,
+                                            )
+                                            .loginWithGoogle();
+                                      },
+                            );
+                          },
+                        ),
                         30.height,
                         // Register Link
                         Center(

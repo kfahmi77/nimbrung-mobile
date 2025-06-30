@@ -16,7 +16,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      final result = await remoteDataSource.login(
+      final result = await remoteDataSource.loginEmail(
         email: email,
         password: password,
       );
@@ -111,6 +111,21 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       AppLogger.error(
         'Repository: Reset password failed',
+        tag: 'AuthRepository',
+        error: e,
+      );
+      return Left(AuthFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> loginWithGoogle() async {
+    try {
+      final result = await remoteDataSource.loginWithGoogle();
+      return Right(result.toEntity());
+    } catch (e) {
+      AppLogger.error(
+        'Repository: Google login failed',
         tag: 'AuthRepository',
         error: e,
       );

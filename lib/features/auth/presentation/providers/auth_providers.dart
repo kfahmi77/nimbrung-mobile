@@ -4,6 +4,7 @@ import '../../data/datasources/auth_remote_data_source_impl.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/login.dart';
+import '../../domain/usecases/login_with_google.dart';
 import '../../domain/usecases/register.dart';
 import '../../domain/usecases/logout.dart';
 import '../../domain/usecases/get_current_user.dart';
@@ -38,6 +39,10 @@ final logoutUseCaseProvider = Provider<LogoutUseCase>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return LogoutUseCase(repository);
 });
+final loginWithGoogleUseCaseProvider = Provider<LoginWithGoogleUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return LoginWithGoogleUseCase(repository);
+});
 
 final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>((ref) {
   final repository = ref.watch(authRepositoryProvider);
@@ -65,9 +70,11 @@ final appAuthNotifierProvider =
     StateNotifierProvider<AppAuthNotifier, AppAuthState>((ref) {
       final getCurrentUserUseCase = ref.watch(getCurrentUserUseCaseProvider);
       final logoutUseCase = ref.watch(logoutUseCaseProvider);
+      final loginWithGoogleUseCase = ref.watch(loginWithGoogleUseCaseProvider);
       return AppAuthNotifier(
         getCurrentUserUseCase: getCurrentUserUseCase,
         logoutUseCase: logoutUseCase,
+        loginWithGoogleUseCase: loginWithGoogleUseCase,
       );
     });
 

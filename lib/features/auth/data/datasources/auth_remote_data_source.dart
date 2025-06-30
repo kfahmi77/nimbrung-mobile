@@ -1,8 +1,15 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../user/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   /// Authentication methods
-  Future<UserModel> login({required String email, required String password});
+  Future<UserModel> loginEmail({
+    required String email,
+    required String password,
+  });
+
+  Future<UserModel> loginWithGoogle();
 
   Future<UserModel> register({
     required String email,
