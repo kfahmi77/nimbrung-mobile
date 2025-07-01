@@ -27,6 +27,8 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _placeController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _fullnameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   // Store selected preference ID instead of name
@@ -34,6 +36,9 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
 
   // Store selected avatar file
   File? _selectedAvatarFile;
+
+  // Store selected gender for Google auth users
+  String? _selectedGender;
 
   @override
   void initState() {
@@ -49,7 +54,28 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
     _dateController.dispose();
     _placeController.dispose();
     _bioController.dispose();
+    _usernameController.dispose();
+    _fullnameController.dispose();
     super.dispose();
+  }
+
+  // Helper function to detect if user was authenticated via Google
+  bool _isGoogleAuthUser(AppAuthState authState) {
+    if (authState is AppAuthAuthenticated) {
+      final user = authState.user;
+      // Google auth users typically have:
+      // 1. No username initially
+      // 2. No gender set
+      // 3. Avatar URL from Google (contains 'googleusercontent' or 'google')
+      // 4. Fullname might be from Google metadata
+      return (user.username == null || user.username!.isEmpty) &&
+          user.gender == null &&
+          (user.avatar?.contains('googleusercontent') == true ||
+              user.avatar?.contains('google') == true ||
+              user.fullname?.contains('@') == false &&
+                  user.fullname != user.email);
+    }
+    return false;
   }
 
   @override
@@ -172,6 +198,63 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                         ),
                       ),
                       24.height,
+
+                      // Additional fields for Google auth users
+                      if (_isGoogleAuthUser(authState)) ...[
+                        // Username field for Google users
+                        CustomTextField(
+                          label: 'Username',
+                          hintText: 'Masukan username',
+                          controller: _usernameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Username tidak boleh kosong';
+                            }
+                            if (value.length < 3) {
+                              return 'Username minimal 3 karakter';
+                            }
+                            // Check for valid username format (alphanumeric and underscore)
+                            if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+                              return 'Username hanya boleh mengandung huruf, angka, dan underscore';
+                            }
+                            return null;
+                          },
+                        ),
+                        14.height,
+
+                        // Fullname field for Google users
+                        CustomTextField(
+                          label: 'Nama Lengkap',
+                          hintText: 'Masukan nama lengkap',
+                          controller: _fullnameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Nama lengkap tidak boleh kosong';
+                            }
+                            if (value.length < 2) {
+                              return 'Nama lengkap minimal 2 karakter';
+                            }
+                            return null;
+                          },
+                        ),
+                        14.height,
+
+                        // Gender field for Google users
+                        CustomDropdownField<String>(
+                          label: 'Jenis Kelamin',
+                          hintText: 'Pilih jenis kelamin',
+                          value: _selectedGender,
+                          items: ['Laki-laki', 'Perempuan'],
+                          itemLabel: (gender) => gender,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedGender = newValue;
+                            });
+                          },
+                        ),
+                        24.height,
+                      ],
+
                       8.height,
                       CustomTextField(
                         label: 'Bio',
@@ -393,18 +476,86 @@ class _RegisterUpdatePageState extends ConsumerState<RegisterUpdatePage> {
                                       }
                                     }
 
+                                    // Additional validation for Google auth users
+                                    if (_isGoogleAuthUser(authState)) {
+                                      if (_usernameController.text
+                                          .trim()
+                                          .isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Username tidak boleh kosong',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      if (_fullnameController.text
+                                          .trim()
+                                          .isEmpty) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Nama lengkap tidak boleh kosong',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      if (_selectedGender == null) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Silakan pilih jenis kelamin',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                    }
+
                                     // Call profile update method first
                                     final notifier = ref.read(
                                       userProfileNotifierProvider.notifier,
                                     );
 
-                                    await notifier.updateProfile(
-                                      userId: currentUserId,
-                                      bio: _bioController.text.trim(),
-                                      birthPlace: _placeController.text.trim(),
-                                      dateBirth: dateBirth,
-                                      preferenceId: _selectedPreferenceId,
-                                    );
+                                    // For Google auth users, include the additional fields
+                                    if (_isGoogleAuthUser(authState)) {
+                                      await notifier.updateProfile(
+                                        userId: currentUserId,
+                                        username:
+                                            _usernameController.text.trim(),
+                                        fullname:
+                                            _fullnameController.text.trim(),
+                                        bio: _bioController.text.trim(),
+                                        birthPlace:
+                                            _placeController.text.trim(),
+                                        dateBirth: dateBirth,
+                                        preferenceId: _selectedPreferenceId,
+                                        gender: _selectedGender,
+                                      );
+                                    } else {
+                                      // For regular users, use the existing logic
+                                      await notifier.updateProfile(
+                                        userId: currentUserId,
+                                        bio: _bioController.text.trim(),
+                                        birthPlace:
+                                            _placeController.text.trim(),
+                                        dateBirth: dateBirth,
+                                        preferenceId: _selectedPreferenceId,
+                                      );
+                                    }
 
                                     // If avatar is selected, update it separately
                                     if (_selectedAvatarFile != null) {
