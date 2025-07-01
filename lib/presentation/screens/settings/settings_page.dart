@@ -5,7 +5,7 @@ import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
 import 'package:nimbrung_mobile/presentation/routes/route_name.dart';
-import 'package:nimbrung_mobile/presentation/screens/settings/user_info_page.dart';
+import 'package:nimbrung_mobile/presentation/screens/settings/user/user_info_page.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -411,9 +411,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 Text(
                   'Pusat Bantuan Nimbrung\n\n'
                   'Jika Anda memerlukan bantuan, berikut adalah beberapa cara untuk menghubungi kami:\n\n'
-                  '📧 Email: support@nimbrung.com\n'
+                  '📧 Email: support@nimbrung.web.id\n'
                   '📱 WhatsApp: +62 812-3456-7890\n'
-                  '🌐 Website: www.nimbrung.com/help\n\n'
+                  '🌐 Website: www.nimbrung.web.id/help\n\n'
                   'Tim dukungan kami siap membantu Anda 24/7.',
                 ),
               ],
