@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
 
-import '../../routes/route_name.dart';
 import '../../themes/color_schemes.dart';
 import '../../widgets/user_avatar.dart';
 

@@ -4,8 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 import 'package:nimbrung_mobile/presentation/themes/color_schemes.dart';
 import 'package:nimbrung_mobile/presentation/widgets/user_avatar.dart';
+import 'package:nimbrung_mobile/presentation/widgets/custom_drop_down_field.dart';
 import 'package:nimbrung_mobile/features/auth/presentation/providers/auth_providers.dart';
 import 'package:nimbrung_mobile/features/auth/presentation/notifiers/app_auth_notifier.dart';
+import 'package:nimbrung_mobile/features/user/presentation/providers/user_providers.dart';
+import 'package:nimbrung_mobile/features/user/presentation/state/user_state.dart';
+import 'package:nimbrung_mobile/features/user/domain/entities/preference.dart';
 
 class UserInfoPage extends ConsumerStatefulWidget {
   const UserInfoPage({super.key});
@@ -25,6 +29,7 @@ class _UserInfoPageState extends ConsumerState<UserInfoPage> {
   bool _isEditing = false;
   String? _selectedGender;
   DateTime? _selectedBirthDate;
+  String? _selectedPreferenceId;
 
   @override
   void initState() {
@@ -52,6 +57,7 @@ class _UserInfoPageState extends ConsumerState<UserInfoPage> {
       _birthPlaceController.text = user.birthPlace ?? '';
       _selectedGender = user.gender;
       _selectedBirthDate = user.dateBirth;
+      _selectedPreferenceId = user.preferenceId;
     }
   }
 
@@ -412,47 +418,63 @@ class _UserInfoPageState extends ConsumerState<UserInfoPage> {
   }
 
   Widget _buildPreferenceField() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.favorite_outline, color: AppColors.primary),
-          16.width,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Preferensi Saat Ini',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
-                  ),
-                ),
-                4.height,
-                UserPreference(
-                  fallbackPreference: 'Belum dipilih',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+    final preferencesAsync = ref.watch(preferencesProvider);
+
+    return preferencesAsync.when(
+      data: (preferences) {
+        // Find the selected preference, or null if none is selected
+        Preference? selectedPreference;
+        if (_selectedPreferenceId != null) {
+          try {
+            selectedPreference = preferences.firstWhere(
+              (pref) => pref.id == _selectedPreferenceId,
+            );
+          } catch (e) {
+            selectedPreference = null;
+          }
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: CustomDropdownField<Preference>(
+            label: 'Bidang Preferensi',
+            hintText: 'Pilih bidang preferensi',
+            value: selectedPreference,
+            items: preferences,
+            itemLabel: (preference) => preference.preferencesName ?? 'Unknown',
+            prefixIcon: Icon(Icons.favorite_outline, color: AppColors.primary),
+            onChanged:
+                _isEditing
+                    ? (preference) {
+                      setState(() {
+                        _selectedPreferenceId = preference?.id;
+                      });
+                    }
+                    : null,
+          ),
+        );
+      },
+      loading:
+          () => const Padding(
+            padding: EdgeInsets.only(bottom: 16),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+      error:
+          (error, stackTrace) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red[200]!),
+              ),
+              child: Text(
+                'Error loading preferences: $error',
+                style: TextStyle(color: Colors.red[700]),
+              ),
             ),
           ),
-          if (_isEditing) ...[
-            16.width,
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
-          ],
-        ],
-      ),
     );
   }
 
@@ -482,21 +504,73 @@ class _UserInfoPageState extends ConsumerState<UserInfoPage> {
     }
   }
 
-  void _saveChanges() {
+  Future<void> _saveChanges() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // Here you would typically save the changes to the backend
-      // For now, we'll just show a success message and exit edit mode
+      try {
+        final authState = ref.read(appAuthNotifierProvider);
+        if (authState is AppAuthAuthenticated) {
+          final userNotifier = ref.read(userProfileNotifierProvider.notifier);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Informasi berhasil diperbarui'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
+          // Update the profile using the user feature with named parameters
+          await userNotifier.updateProfile(
+            userId: authState.user.id,
+            username:
+                _usernameController.text.trim().isNotEmpty
+                    ? _usernameController.text.trim()
+                    : null,
+            fullname:
+                _fullnameController.text.trim().isNotEmpty
+                    ? _fullnameController.text.trim()
+                    : null,
+            bio:
+                _bioController.text.trim().isNotEmpty
+                    ? _bioController.text.trim()
+                    : null,
+            birthPlace:
+                _birthPlaceController.text.trim().isNotEmpty
+                    ? _birthPlaceController.text.trim()
+                    : null,
+            dateBirth: _selectedBirthDate,
+            gender: _selectedGender,
+            preferenceId: _selectedPreferenceId,
+          );
 
-      setState(() {
-        _isEditing = false;
-      });
+          // Check if update was successful
+          final userState = ref.read(userProfileNotifierProvider);
+          if (userState is UserLoaded) {
+            // Update auth state with new user data
+            final authNotifier = ref.read(appAuthNotifierProvider.notifier);
+            authNotifier.setAuthenticated(userState.user);
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Informasi berhasil diperbarui'),
+                backgroundColor: AppColors.primary,
+              ),
+            );
+
+            setState(() {
+              _isEditing = false;
+            });
+          } else if (userState is UserError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Gagal memperbarui informasi: ${userState.message}',
+                ),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Terjadi kesalahan: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 }
