@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nimbrung_mobile/features/daily-readings/presentation/screens/resension_detail_page.dart';
+import 'package:nimbrung_mobile/features/readings/presentation/screens/resension_detail_page.dart';
+import 'package:nimbrung_mobile/features/readings/presentation/screens/daily_reading_detail_screen.dart';
 import 'package:nimbrung_mobile/presentation/screens/homepage/discussion_room_page.dart';
 import 'package:nimbrung_mobile/presentation/screens/splash/splash_screen.dart';
 
@@ -126,6 +127,21 @@ final routerProvider = Provider<GoRouter>((ref) {
                         print('Current location: ${state.uri}');
                       }
                       return const ReadingReviewDetailScreen();
+                    },
+                  ),
+                  // Nested route for daily reading detail
+                  GoRoute(
+                    path: 'daily-reading/:readingId',
+                    name: RouteNames.dailyReadingDetail,
+                    builder: (context, state) {
+                      final readingId = state.pathParameters['readingId']!;
+                      if (kDebugMode) {
+                        print(
+                          'Navigating to daily reading detail with readingId: $readingId',
+                        );
+                        print('Current location: ${state.uri}');
+                      }
+                      return DailyReadingDetailScreen(readingId: readingId);
                     },
                   ),
                   // Nested route for chat list

@@ -11,6 +11,7 @@ class RouteNames {
   static const String profile = 'profile';
   static const String discussionRoom = 'discussion-room';
   static const String detailReading = 'detail-reading';
+  static const String dailyReadingDetail = 'daily-reading-detail';
   static const String chatList = 'chat-list';
   static const String chatDetail = 'chat-detail';
   static const String settings = 'settings';
