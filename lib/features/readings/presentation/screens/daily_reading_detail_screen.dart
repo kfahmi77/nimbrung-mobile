@@ -5,6 +5,8 @@ import '../../../../../core/utils/extension/spacing_extension.dart';
 import '../../../../../presentation/themes/color_schemes.dart';
 import '../../../auth/presentation/notifiers/app_auth_notifier.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../discussions/presentation/widgets/join_discussion_button.dart'
+    show ComingSoonDiscussionButton;
 import '../../domain/entities/daily_reading.dart';
 import '../providers/daily_reading_providers.dart';
 
@@ -133,6 +135,8 @@ class _DailyReadingDetailScreenState
           24.height,
           _buildActionButtons(reading, userId),
           24.height,
+          _buildDiscussionSection(reading),
+          48.height,
         ],
       ),
     );
@@ -616,5 +620,9 @@ class _DailyReadingDetailScreenState
         },
       );
     });
+  }
+
+  Widget _buildDiscussionSection(DailyReading reading) {
+    return ComingSoonDiscussionButton(readingTitle: reading.title);
   }
 }

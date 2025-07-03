@@ -77,26 +77,29 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
 
       // More specific error handling
       final errorString = e.toString().toLowerCase();
-      
-      if (errorString.contains('function get_today_reading') && 
-          (errorString.contains('does not exist') || errorString.contains('undefined'))) {
+
+      if (errorString.contains('function get_today_reading') &&
+          (errorString.contains('does not exist') ||
+              errorString.contains('undefined'))) {
         throw Exception(
           'RPC function get_today_reading does not exist. Please apply sql/rpc_functions_only.sql to your Supabase database.',
         );
       }
-      
-      if (errorString.contains('relation') && errorString.contains('does not exist')) {
+
+      if (errorString.contains('relation') &&
+          errorString.contains('does not exist')) {
         throw Exception(
           'Database tables missing. Please ensure all required tables exist in your Supabase database.',
         );
       }
-      
-      if (errorString.contains('column') && errorString.contains('does not exist')) {
+
+      if (errorString.contains('column') &&
+          errorString.contains('does not exist')) {
         throw Exception(
           'Database schema mismatch. Some columns are missing from your tables.',
         );
       }
-      
+
       if (errorString.contains('permission denied')) {
         throw Exception(
           'Permission denied accessing database. Check your RLS policies and user permissions.',
@@ -104,9 +107,7 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
       }
 
       // For debugging - include the original error
-      throw Exception(
-        'Failed to get today reading: ${e.toString()}',
-      );
+      throw Exception('Failed to get today reading: ${e.toString()}');
     }
   }
 

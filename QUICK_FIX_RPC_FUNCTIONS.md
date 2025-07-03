@@ -23,9 +23,9 @@ Run this query in SQL Editor to test:
 
 ```sql
 -- Check if functions exist
-SELECT routine_name 
-FROM information_schema.routines 
-WHERE routine_schema = 'public' 
+SELECT routine_name
+FROM information_schema.routines
+WHERE routine_schema = 'public'
 AND routine_name LIKE '%reading%';
 
 -- Test the main function (replace with your actual user ID)
@@ -42,6 +42,7 @@ SELECT * FROM get_today_reading('your-user-id'::uuid);
 ## 5. Troubleshooting
 
 If you get "no data found" errors:
+
 - Check if your user has a preference_id set
 - Verify reading subjects exist for that preference
 - Ensure daily_readings table has content
