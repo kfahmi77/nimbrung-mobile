@@ -75,16 +75,38 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
         stackTrace: stackTrace,
       );
 
-      // If the error is related to missing RPC function, provide a helpful message
-      if (e.toString().contains('function get_today_reading') ||
-          e.toString().contains('does not exist') ||
-          e.toString().contains('undefined function')) {
+      // More specific error handling
+      final errorString = e.toString().toLowerCase();
+      
+      if (errorString.contains('function get_today_reading') && 
+          (errorString.contains('does not exist') || errorString.contains('undefined'))) {
         throw Exception(
-          'Database schema not initialized. Please apply the SQL schema from sql/daily_reading_schema.sql and sql/daily_reading_dummy_data.sql to your Supabase database.',
+          'RPC function get_today_reading does not exist. Please apply sql/rpc_functions_only.sql to your Supabase database.',
+        );
+      }
+      
+      if (errorString.contains('relation') && errorString.contains('does not exist')) {
+        throw Exception(
+          'Database tables missing. Please ensure all required tables exist in your Supabase database.',
+        );
+      }
+      
+      if (errorString.contains('column') && errorString.contains('does not exist')) {
+        throw Exception(
+          'Database schema mismatch. Some columns are missing from your tables.',
+        );
+      }
+      
+      if (errorString.contains('permission denied')) {
+        throw Exception(
+          'Permission denied accessing database. Check your RLS policies and user permissions.',
         );
       }
 
-      rethrow;
+      // For debugging - include the original error
+      throw Exception(
+        'Failed to get today reading: ${e.toString()}',
+      );
     }
   }
 
@@ -146,7 +168,7 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
               e.toString().contains('relation') ||
               e.toString().contains('table'))) {
         throw Exception(
-          'Database schema not initialized. Please apply the SQL schema from sql/daily_reading_schema.sql and sql/daily_reading_dummy_data.sql to your Supabase database.',
+          'Tables missing. Please apply sql/daily_reading_schema.sql to your Supabase database or see DAILY_READING_DATABASE_SETUP.md for instructions.',
         );
       }
 
@@ -240,7 +262,7 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
           e.toString().contains('does not exist') ||
           e.toString().contains('undefined function')) {
         throw Exception(
-          'Database schema not initialized. Please apply the SQL schema from sql/daily_reading_schema.sql and sql/daily_reading_dummy_data.sql to your Supabase database.',
+          'RPC functions missing. Please apply sql/rpc_functions_only.sql to your Supabase database or see QUICK_FIX_RPC_FUNCTIONS.md for instructions.',
         );
       }
 
