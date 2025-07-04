@@ -9,6 +9,7 @@ import '../../../discussions/presentation/widgets/join_discussion_button.dart'
     show ComingSoonDiscussionButton;
 import '../../domain/entities/daily_reading.dart';
 import '../providers/daily_reading_providers.dart';
+import '../widgets/reading_testing_widget.dart';
 
 class DailyReadingDetailScreen extends ConsumerStatefulWidget {
   final String readingId;
@@ -24,20 +25,16 @@ class _DailyReadingDetailScreenState
     extends ConsumerState<DailyReadingDetailScreen> {
   bool _isReadingMode = false;
   double _fontSize = 16.0;
-  int _readTimeSeconds = 0;
-  late DateTime _startTime;
-  bool _wasHelpful = true;
-  final TextEditingController _noteController = TextEditingController();
+  bool? _userFeedback; // null = no feedback, true = helpful, false = not helpful
+  String? _currentReadingId; // Track current reading ID to reset feedback on new reading
 
   @override
   void initState() {
     super.initState();
-    _startTime = DateTime.now();
   }
 
   @override
   void dispose() {
-    _noteController.dispose();
     super.dispose();
   }
 
@@ -54,7 +51,7 @@ class _DailyReadingDetailScreenState
     final userId = authState.user.id;
 
     // For now, let's get today's reading and find the specific one
-    final todayReadingAsync = ref.watch(todayReadingProvider(userId));
+    final todayReadingAsync = ref.watch(autoRefreshTodayReadingProvider(userId));
 
     return Scaffold(
       backgroundColor: _isReadingMode ? Colors.white : Colors.grey[50],
@@ -69,11 +66,10 @@ class _DailyReadingDetailScreenState
                   const Icon(Icons.error_outline, size: 64, color: Colors.grey),
                   16.height,
                   Text('Error: $error'),
-                  16.height,
-                  ElevatedButton(
-                    onPressed: () => ref.refresh(todayReadingProvider(userId)),
-                    child: const Text('Retry'),
-                  ),
+                  16.height,                    ElevatedButton(
+                      onPressed: () => ref.refresh(autoRefreshTodayReadingProvider(userId)),
+                      child: const Text('Retry'),
+                    ),
                 ],
               ),
             ),
@@ -81,6 +77,17 @@ class _DailyReadingDetailScreenState
           if (reading == null) {
             return const Center(child: Text('Reading not found'));
           }
+          
+          // Reset feedback state if this is a new reading
+          if (_currentReadingId != reading.id) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              setState(() {
+                _currentReadingId = reading.id;
+                _userFeedback = null;
+              });
+            });
+          }
+          
           return _buildContent(reading, userId);
         },
       ),
@@ -123,6 +130,7 @@ class _DailyReadingDetailScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          ReadingTestingWidget(userId: userId),
           _buildReadingHeader(reading),
           24.height,
           _buildReadingContent(reading),
@@ -415,22 +423,30 @@ class _DailyReadingDetailScreenState
   }
 
   Widget _buildActionButtons(DailyReading reading, String userId) {
-    if (reading.isCompleted) {
+    // Show feedback given state if user has provided feedback
+    if (_userFeedback != null) {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.green[50],
+          color: _userFeedback! ? Colors.green[50] : Colors.orange[50],
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.green[200]!),
+          border: Border.all(
+            color: _userFeedback! ? Colors.green[200]! : Colors.orange[200]!,
+          ),
         ),
         child: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.green[700]),
+            Icon(
+              _userFeedback! ? Icons.thumb_up : Icons.thumb_down,
+              color: _userFeedback! ? Colors.green[700] : Colors.orange[700],
+            ),
             12.width,
-            const Expanded(
+            Expanded(
               child: Text(
-                'Selamat! Anda telah menyelesaikan bacaan ini.',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                _userFeedback!
+                    ? 'Terima kasih! Feedback Anda membantu kami.'
+                    : 'Terima kasih atas feedback Anda. Kami akan terus perbaiki.',
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -455,82 +471,95 @@ class _DailyReadingDetailScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Selesaikan Bacaan',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            'Apakah bacaan ini membantu?',
+            style: TextStyle(
+              fontSize: 18, 
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          16.height,
+          8.height,
           const Text(
-            'Apakah bacaan ini membantu Anda?',
-            style: TextStyle(fontSize: 14),
+            'Berikan feedback Anda dengan sekali tap',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+            ),
           ),
-          12.height,
+          20.height,
           Row(
             children: [
               Expanded(
-                child: Row(
-                  children: [
-                    Radio<bool>(
-                      value: true,
-                      groupValue: _wasHelpful,
-                      onChanged:
-                          (value) => setState(() => _wasHelpful = value!),
-                    ),
-                    const Text('Ya, sangat membantu'),
-                  ],
+                child: _buildThumbButton(
+                  icon: Icons.thumb_up,
+                  label: 'Membantu',
+                  color: Colors.green,
+                  isHelpful: true,
+                  onPressed: () => _quickReaction(reading, userId, true),
                 ),
               ),
-            ],
-          ),
-          Row(
-            children: [
+              16.width,
               Expanded(
-                child: Row(
-                  children: [
-                    Radio<bool>(
-                      value: false,
-                      groupValue: _wasHelpful,
-                      onChanged:
-                          (value) => setState(() => _wasHelpful = value!),
-                    ),
-                    const Text('Kurang membantu'),
-                  ],
+                child: _buildThumbButton(
+                  icon: Icons.thumb_down,
+                  label: 'Kurang',
+                  color: Colors.red,
+                  isHelpful: false,
+                  onPressed: () => _quickReaction(reading, userId, false),
                 ),
               ),
             ],
-          ),
-          16.height,
-          TextField(
-            controller: _noteController,
-            decoration: const InputDecoration(
-              labelText: 'Catatan (opsional)',
-              hintText: 'Tulis catatan atau refleksi Anda...',
-              border: OutlineInputBorder(),
-            ),
-            maxLines: 3,
-          ),
-          24.height,
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => _completeReading(reading, userId),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Tandai Selesai',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildThumbButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required bool isHelpful,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 28,
+                    color: color,
+                  ),
+                ),
+                12.height,
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -578,21 +607,18 @@ class _DailyReadingDetailScreenState
     ).showSnackBar(const SnackBar(content: Text('Berbagi bacaan...')));
   }
 
-  void _completeReading(DailyReading reading, String userId) {
-    final endTime = DateTime.now();
-    _readTimeSeconds = endTime.difference(_startTime).inSeconds;
+  void _quickReaction(DailyReading reading, String userId, bool isHelpful) {
+    // Set local feedback state immediately
+    setState(() {
+      _userFeedback = isHelpful;
+    });
 
     ref
         .read(readingCompletionProvider.notifier)
-        .completeReading(
+        .recordFeedback(
           userId: userId,
           readingId: reading.id,
-          readTimeSeconds: _readTimeSeconds,
-          wasHelpful: _wasHelpful,
-          userNote:
-              _noteController.text.trim().isEmpty
-                  ? null
-                  : _noteController.text.trim(),
+          isHelpful: isHelpful,
         );
 
     // Listen to completion result
@@ -601,16 +627,28 @@ class _DailyReadingDetailScreenState
         data: (result) {
           if (result != null) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Selamat! Bacaan telah diselesaikan.'),
-                backgroundColor: Colors.green,
+              SnackBar(
+                content: Text(
+                  isHelpful 
+                    ? 'Feedback berhasil disimpan!' 
+                    : 'Feedback berhasil disimpan!',
+                ),
+                backgroundColor: isHelpful ? Colors.green : Colors.orange,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                duration: const Duration(seconds: 2),
               ),
             );
-            // Refresh the reading data
-            ref.invalidate(todayReadingProvider(userId));
+            // Don't refresh the provider to keep reading visible
           }
         },
         error: (error, stackTrace) {
+          // Reset feedback state on error
+          setState(() {
+            _userFeedback = null;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: $error'),
@@ -626,3 +664,4 @@ class _DailyReadingDetailScreenState
     return ComingSoonDiscussionButton(readingTitle: reading.title);
   }
 }
+

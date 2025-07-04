@@ -27,6 +27,21 @@ abstract class DailyReadingRemoteDataSource {
     String subjectId,
     int daySequence,
   );
+  Future<Map<String, dynamic>> recordReadingFeedback({
+    required String userId,
+    required String readingId,
+    required bool wasHelpful,
+    String? userNote,
+  });
+
+  Future<Map<String, dynamic>> simulateDayChange({
+    required String userId,
+    int daysToAdvance = 1,
+  });
+
+  Future<Map<String, dynamic>> resetToDay1(String userId);
+
+  Future<Map<String, dynamic>> getReadingInfo(String userId);
 }
 
 class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
@@ -369,6 +384,152 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
     } catch (e, stackTrace) {
       AppLogger.error(
         'Failed to get specific reading',
+        tag: 'DailyReadingDataSource',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> recordReadingFeedback({
+    required String userId,
+    required String readingId,
+    required bool wasHelpful,
+    String? userNote,
+  }) async {
+    try {
+      AppLogger.info(
+        'Recording feedback for user: $userId, reading: $readingId, helpful: $wasHelpful',
+        tag: 'DailyReadingDataSource',
+      );
+
+      final response = await supabaseClient.rpc(
+        'record_reading_feedback',
+        params: {
+          'p_user_id': userId,
+          'p_reading_id': readingId,
+          'p_was_helpful': wasHelpful,
+          if (userNote != null) 'p_user_note': userNote,
+        },
+      );
+
+      AppLogger.info(
+        'Successfully recorded reading feedback',
+        tag: 'DailyReadingDataSource',
+      );
+      return response as Map<String, dynamic>;
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Failed to record reading feedback',
+        tag: 'DailyReadingDataSource',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
+      // If the error is related to missing RPC function, provide a helpful message
+      if (e.toString().contains('function record_reading_feedback') ||
+          e.toString().contains('does not exist') ||
+          e.toString().contains('undefined function')) {
+        throw Exception(
+          'RPC function record_reading_feedback missing. Please apply the updated sql/rpc_functions_only.sql to your Supabase database.',
+        );
+      }
+
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> simulateDayChange({
+    required String userId,
+    int daysToAdvance = 1,
+  }) async {
+    try {
+      AppLogger.info(
+        'Simulating day change for user: $userId, days: $daysToAdvance',
+        tag: 'DailyReadingDataSource',
+      );
+
+      final response = await supabaseClient.rpc(
+        'simulate_day_change',
+        params: {
+          'p_user_id': userId,
+          'p_days_to_advance': daysToAdvance,
+        },
+      );
+
+      AppLogger.info(
+        'Successfully simulated day change',
+        tag: 'DailyReadingDataSource',
+      );
+      return response as Map<String, dynamic>;
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Failed to simulate day change',
+        tag: 'DailyReadingDataSource',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> resetToDay1(String userId) async {
+    try {
+      AppLogger.info(
+        'Resetting to day 1 for user: $userId',
+        tag: 'DailyReadingDataSource',
+      );
+
+      final response = await supabaseClient.rpc(
+        'reset_to_day_1',
+        params: {
+          'p_user_id': userId,
+        },
+      );
+
+      AppLogger.info(
+        'Successfully reset to day 1',
+        tag: 'DailyReadingDataSource',
+      );
+      return response as Map<String, dynamic>;
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Failed to reset to day 1',
+        tag: 'DailyReadingDataSource',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> getReadingInfo(String userId) async {
+    try {
+      AppLogger.info(
+        'Getting reading info for user: $userId',
+        tag: 'DailyReadingDataSource',
+      );
+
+      final response = await supabaseClient.rpc(
+        'get_reading_info',
+        params: {
+          'p_user_id': userId,
+        },
+      );
+
+      AppLogger.info(
+        'Successfully got reading info',
+        tag: 'DailyReadingDataSource',
+      );
+      return response as Map<String, dynamic>;
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Failed to get reading info',
         tag: 'DailyReadingDataSource',
         error: e,
         stackTrace: stackTrace,

@@ -38,7 +38,7 @@ BEGIN
     dr.tomorrow_hint,
     dr.read_time_minutes,
     dr.created_at,
-    (rc.id IS NOT NULL) as is_completed
+    (rc.id IS NOT NULL AND rc.completed_at IS NOT NULL) as is_completed
   FROM public.daily_readings dr
   JOIN public.reading_subjects rs ON dr.subject_id = rs.id
   JOIN public.users u ON u.preference_id = rs.preference_id
@@ -206,6 +206,49 @@ BEGIN
 END;
 $$;
 
+-- RPC function to record reading feedback without completing
+CREATE OR REPLACE FUNCTION record_reading_feedback(
+  p_user_id UUID,
+  p_reading_id UUID,
+  p_was_helpful BOOLEAN,
+  p_user_note TEXT DEFAULT NULL
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  v_result JSON;
+BEGIN
+  -- Insert into reading_feedback table (create a separate table for feedback only)
+  -- Or update the existing reading_completions table but don't mark as completed
+  
+  -- For now, we'll use a simpler approach: just insert/update in reading_completions
+  -- but with a special flag or null completion date to indicate it's just feedback
+  INSERT INTO public.reading_completions (user_id, reading_id, was_helpful, user_note, completed_at)
+  VALUES (p_user_id, p_reading_id, p_was_helpful, p_user_note, NULL)
+  ON CONFLICT (user_id, reading_id) DO UPDATE SET
+    was_helpful = EXCLUDED.was_helpful,
+    user_note = EXCLUDED.user_note,
+    -- Don't update completed_at, keep it NULL for feedback-only records
+    completed_at = CASE 
+      WHEN public.reading_completions.completed_at IS NOT NULL 
+      THEN public.reading_completions.completed_at  -- Keep existing completion date
+      ELSE NULL  -- Keep as NULL for feedback-only
+    END;
+  
+  -- Return success response
+  SELECT json_build_object(
+    'success', true,
+    'message', 'Feedback recorded successfully',
+    'was_helpful', p_was_helpful
+  ) INTO v_result;
+  
+  RETURN v_result;
+END;
+$$;
+
 -- ============================================================================
 -- ESSENTIAL SAMPLE DATA
 -- ============================================================================
@@ -288,3 +331,169 @@ ON CONFLICT (subject_id, day_sequence) DO NOTHING;
 
 -- Run this to verify everything is working:
 -- SELECT * FROM get_today_reading('your-user-id'::uuid);
+
+-- ============================================================================
+-- TESTING FUNCTIONS SECTION
+-- ============================================================================
+
+-- RPC function to simulate day change for testing
+CREATE OR REPLACE FUNCTION simulate_day_change(
+  p_user_id UUID,
+  p_days_to_advance INTEGER DEFAULT 1
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  v_result JSON;
+  v_subject_id UUID;
+  v_new_day INTEGER;
+  v_max_day INTEGER;
+BEGIN
+  -- Get user's active subject
+  SELECT rs.id INTO v_subject_id
+  FROM public.reading_subjects rs
+  JOIN public.users u ON u.preference_id = rs.preference_id
+  WHERE u.id = p_user_id AND rs.is_active = true
+  ORDER BY rs.created_at
+  LIMIT 1;
+  
+  IF v_subject_id IS NULL THEN
+    RETURN json_build_object(
+      'success', false,
+      'message', 'No active subject found for user'
+    );
+  END IF;
+  
+  -- Get max available day for this subject
+  SELECT MAX(day_sequence) INTO v_max_day
+  FROM public.daily_readings
+  WHERE subject_id = v_subject_id;
+  
+  -- Update or insert user progress
+  INSERT INTO public.user_reading_progress (user_id, subject_id, current_day, last_read_date)
+  VALUES (p_user_id, v_subject_id, 1 + p_days_to_advance, CURRENT_DATE)
+  ON CONFLICT (user_id, subject_id) DO UPDATE SET
+    current_day = CASE 
+      WHEN public.user_reading_progress.current_day + p_days_to_advance > v_max_day 
+      THEN 1  -- Reset to day 1 if exceeds max
+      ELSE public.user_reading_progress.current_day + p_days_to_advance
+    END,
+    last_read_date = CURRENT_DATE;
+  
+  -- Get the new current day
+  SELECT current_day INTO v_new_day
+  FROM public.user_reading_progress
+  WHERE user_id = p_user_id AND subject_id = v_subject_id;
+  
+  SELECT json_build_object(
+    'success', true,
+    'message', 'Day advanced successfully',
+    'new_day', v_new_day,
+    'max_day', v_max_day,
+    'reset_to_day_1', v_new_day = 1 AND p_days_to_advance > 0
+  ) INTO v_result;
+  
+  RETURN v_result;
+END;
+$$;
+
+-- RPC function to reset user progress to day 1
+CREATE OR REPLACE FUNCTION reset_to_day_1(p_user_id UUID)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  v_result JSON;
+  v_subject_id UUID;
+BEGIN
+  -- Get user's active subject
+  SELECT rs.id INTO v_subject_id
+  FROM public.reading_subjects rs
+  JOIN public.users u ON u.preference_id = rs.preference_id
+  WHERE u.id = p_user_id AND rs.is_active = true
+  ORDER BY rs.created_at
+  LIMIT 1;
+  
+  IF v_subject_id IS NULL THEN
+    RETURN json_build_object(
+      'success', false,
+      'message', 'No active subject found for user'
+    );
+  END IF;
+  
+  -- Reset user progress to day 1
+  INSERT INTO public.user_reading_progress (user_id, subject_id, current_day, last_read_date)
+  VALUES (p_user_id, v_subject_id, 1, CURRENT_DATE)
+  ON CONFLICT (user_id, subject_id) DO UPDATE SET
+    current_day = 1,
+    last_read_date = CURRENT_DATE;
+  
+  SELECT json_build_object(
+    'success', true,
+    'message', 'Progress reset to day 1 successfully',
+    'current_day', 1
+  ) INTO v_result;
+  
+  RETURN v_result;
+END;
+$$;
+
+-- RPC function to get current day and max day info
+CREATE OR REPLACE FUNCTION get_reading_info(p_user_id UUID)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  v_result JSON;
+  v_subject_id UUID;
+  v_current_day INTEGER;
+  v_max_day INTEGER;
+  v_subject_name VARCHAR;
+BEGIN
+  -- Get user's active subject
+  SELECT rs.id, rs.name INTO v_subject_id, v_subject_name
+  FROM public.reading_subjects rs
+  JOIN public.users u ON u.preference_id = rs.preference_id
+  WHERE u.id = p_user_id AND rs.is_active = true
+  ORDER BY rs.created_at
+  LIMIT 1;
+  
+  IF v_subject_id IS NULL THEN
+    RETURN json_build_object(
+      'success', false,
+      'message', 'No active subject found for user'
+    );
+  END IF;
+  
+  -- Get current day from progress
+  SELECT COALESCE(current_day, 1) INTO v_current_day
+  FROM public.user_reading_progress
+  WHERE user_id = p_user_id AND subject_id = v_subject_id;
+  
+  IF v_current_day IS NULL THEN
+    v_current_day := 1;
+  END IF;
+  
+  -- Get max available day
+  SELECT MAX(day_sequence) INTO v_max_day
+  FROM public.daily_readings
+  WHERE subject_id = v_subject_id;
+  
+  SELECT json_build_object(
+    'success', true,
+    'subject_name', v_subject_name,
+    'current_day', v_current_day,
+    'max_day', COALESCE(v_max_day, 1),
+    'has_next_day', v_current_day < COALESCE(v_max_day, 1)
+  ) INTO v_result;
+  
+  RETURN v_result;
+END;
+$$;

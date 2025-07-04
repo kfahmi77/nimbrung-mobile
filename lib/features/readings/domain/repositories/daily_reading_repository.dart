@@ -32,4 +32,16 @@ abstract class DailyReadingRepository {
     String subjectId,
     int daySequence,
   );
+  Future<Either<Failure, Map<String, dynamic>>> recordReadingFeedback({
+    required String userId,
+    required String readingId,
+    required bool wasHelpful,
+    String? userNote,
+  });
+  Future<Either<Failure, Map<String, dynamic>>> simulateDayChange({
+    required String userId,
+    int daysToAdvance = 1,
+  });
+  Future<Either<Failure, Map<String, dynamic>>> resetToDay1(String userId);
+  Future<Either<Failure, Map<String, dynamic>>> getReadingInfo(String userId);
 }

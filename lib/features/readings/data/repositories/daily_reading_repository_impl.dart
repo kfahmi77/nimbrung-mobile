@@ -174,4 +174,104 @@ class DailyReadingRepositoryImpl implements DailyReadingRepository {
       );
     }
   }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> recordReadingFeedback({
+    required String userId,
+    required String readingId,
+    required bool wasHelpful,
+    String? userNote,
+  }) async {
+    try {
+      final result = await remoteDataSource.recordReadingFeedback(
+        userId: userId,
+        readingId: readingId,
+        wasHelpful: wasHelpful,
+        userNote: userNote,
+      );
+      return Right(result);
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Repository: Failed to record reading feedback',
+        tag: 'DailyReadingRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return Left(
+        ServerFailure(
+          message: 'Failed to record reading feedback: $e',
+          code: 'RECORD_FEEDBACK_ERROR',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> simulateDayChange({
+    required String userId,
+    int daysToAdvance = 1,
+  }) async {
+    try {
+      final result = await remoteDataSource.simulateDayChange(
+        userId: userId,
+        daysToAdvance: daysToAdvance,
+      );
+      return Right(result);
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Repository: Failed to simulate day change',
+        tag: 'DailyReadingRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return Left(
+        ServerFailure(
+          message: 'Failed to simulate day change: $e',
+          code: 'SIMULATE_DAY_CHANGE_ERROR',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> resetToDay1(String userId) async {
+    try {
+      final result = await remoteDataSource.resetToDay1(userId);
+      return Right(result);
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Repository: Failed to reset to day 1',
+        tag: 'DailyReadingRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return Left(
+        ServerFailure(
+          message: 'Failed to reset to day 1: $e',
+          code: 'RESET_TO_DAY_1_ERROR',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> getReadingInfo(String userId) async {
+    try {
+      final result = await remoteDataSource.getReadingInfo(userId);
+      return Right(result);
+    } catch (e, stackTrace) {
+      AppLogger.error(
+        'Repository: Failed to get reading info',
+        tag: 'DailyReadingRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return Left(
+        ServerFailure(
+          message: 'Failed to get reading info: $e',
+          code: 'GET_READING_INFO_ERROR',
+        ),
+      );
+    }
+  }
 }
