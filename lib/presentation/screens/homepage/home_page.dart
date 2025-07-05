@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nimbrung_mobile/core/utils/extension/spacing_extension.dart';
 
 import '../../themes/color_schemes.dart';
 import '../../providers/drawer_provider.dart';
 import 'appbar.dart';
 import '../../../features/daily-readings/presentation/screens/widgets/resension.dart';
+import '../../../features/daily_reading/presentation/widgets/daily_reading_card.dart';
 import '../../widgets/chat_bot_avatar.dart';
 import './home_drawer.dart';
 
@@ -124,141 +123,8 @@ class _HomePageState extends ConsumerState<HomePage>
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  // Card container
-                                  Container(
-                                    margin: EdgeInsets.only(top: 16),
-                                    padding: EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.15),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: Colors.white.withOpacity(0.2),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Main content
-                                        Text(
-                                          'Psikologi kognitif adalah cabang dari psikologi yang mempelajari proses mental internal seperti persepsi, memori, pemikiran,',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            height: 1.4,
-                                          ),
-                                        ),
-                                        8.height,
-                                        Text(
-                                          'dan pengambilan keputusan.',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            height: 1.4,
-                                          ),
-                                        ),
-                                        16.height,
-
-                                        // Source
-                                        Text(
-                                          'Solso, R. L. (2008). Cognitive Psychology: Edisi Kedelapan. Erlangga.',
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(
-                                              0.8,
-                                            ),
-                                            fontSize: 12,
-                                            fontStyle: FontStyle.italic,
-                                          ),
-                                        ),
-                                        24.height,
-
-                                        // Action buttons
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  // Navigate to nested discussion route
-                                                  context.go(
-                                                    '/home/discussion',
-                                                  );
-                                                },
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                    vertical: 12,
-                                                    horizontal: 16,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          12,
-                                                        ),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      'Diskusikan',
-                                                      style: TextStyle(
-                                                        color:
-                                                            AppColors.primary,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 16,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            16.width,
-                                            Container(
-                                              padding: EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Icons.thumb_up_alt_outlined,
-                                                color: AppColors.primary,
-                                                size: 22,
-                                              ),
-                                            ),
-                                            8.width,
-                                            Container(
-                                              padding: EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Icons
-                                                    .thumb_down_off_alt_rounded,
-                                                color: AppColors.primary,
-                                                size: 22,
-                                              ),
-                                            ),
-                                            8.width,
-                                            Container(
-                                              padding: EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: SvgPicture.asset(
-                                                'assets/images/share.svg',
-                                                width: 22,
-                                                height: 22,
-                                              ),
-                                            ),
-                                            8.width,
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                  // Dynamic Daily Reading Card
+                                  DailyReadingCard(),
                                 ],
                               ),
                             ),
