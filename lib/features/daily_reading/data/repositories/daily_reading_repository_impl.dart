@@ -33,14 +33,22 @@ class DailyReadingRepositoryImpl implements DailyReadingRepository {
   }
 
   @override
-  Future<bool> submitFeedback(String userId, String readingId, String feedbackType) async {
+  Future<bool> submitFeedback(
+    String userId,
+    String readingId,
+    String feedbackType,
+  ) async {
     AppLogger.info(
       'Repository: Submitting feedback - user: $userId, reading: $readingId, type: $feedbackType',
       tag: 'DailyReadingRepository',
     );
 
     try {
-      final result = await _remoteDataSource.submitFeedback(userId, readingId, feedbackType);
+      final result = await _remoteDataSource.submitFeedback(
+        userId,
+        readingId,
+        feedbackType,
+      );
       final success = result['success'] == true;
       AppLogger.info(
         'Repository: Feedback submission result: $success',

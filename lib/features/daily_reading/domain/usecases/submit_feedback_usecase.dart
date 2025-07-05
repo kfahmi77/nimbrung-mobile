@@ -6,7 +6,11 @@ class SubmitFeedbackUseCase {
 
   SubmitFeedbackUseCase(this._repository);
 
-  Future<bool> call(String userId, String readingId, String feedbackType) async {
+  Future<bool> call(
+    String userId,
+    String readingId,
+    String feedbackType,
+  ) async {
     AppLogger.info(
       'UseCase: Submitting feedback - user: $userId, reading: $readingId, type: $feedbackType',
       tag: 'SubmitFeedbackUseCase',
@@ -21,7 +25,11 @@ class SubmitFeedbackUseCase {
     }
 
     try {
-      final result = await _repository.submitFeedback(userId, readingId, feedbackType);
+      final result = await _repository.submitFeedback(
+        userId,
+        readingId,
+        feedbackType,
+      );
       AppLogger.info(
         'UseCase: Feedback submission result: $result',
         tag: 'SubmitFeedbackUseCase',

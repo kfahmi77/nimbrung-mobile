@@ -7,10 +7,12 @@ Your existing database schema has been analyzed and the SQL functions have been 
 ### Key Schema Differences Addressed:
 
 1. **Table Names**:
+
    - Using `preferences` instead of `user_preferences`
    - Using existing `users`, `scopes`, `readings`, `daily_readings`, `reading_feedbacks` tables
 
 2. **Relationship Structure**:
+
    - `users.preference_id` → `preferences.id` (your schema)
    - `scopes.preference_id` → `preferences.id` (your schema)
 
@@ -50,40 +52,46 @@ SELECT id, username, preference_id FROM users WHERE preference_id IS NOT NULL;
 ### 3. Common Database Errors & Solutions
 
 #### Error: "function get_daily_reading does not exist"
+
 **Solution**: Apply the updated SQL functions from `sql/daily_reading_system_fixed.sql`
 
 #### Error: "relation user_preferences does not exist"
+
 **Solution**: The functions have been updated to use your `preferences` table instead
 
 #### Error: "column preferences_name does not exist"
+
 **Solution**: The functions now use `preferences_name` field as in your schema
 
 #### Error: "No daily reading found"
+
 **Possible Causes**:
+
 1. User has no `preference_id` set
 2. No scopes exist for the user's preference
 3. No active readings exist
 4. All readings have been read in the last 30 days
 
 **Debug Steps**:
+
 ```sql
 -- Check user's preference
-SELECT u.id, u.username, u.preference_id, p.preferences_name 
-FROM users u 
-LEFT JOIN preferences p ON u.preference_id = p.id 
+SELECT u.id, u.username, u.preference_id, p.preferences_name
+FROM users u
+LEFT JOIN preferences p ON u.preference_id = p.id
 WHERE u.id = 'YOUR_USER_ID';
 
 -- Check scopes for user's preference
-SELECT s.* FROM scopes s 
-JOIN users u ON s.preference_id = u.preference_id 
+SELECT s.* FROM scopes s
+JOIN users u ON s.preference_id = u.preference_id
 WHERE u.id = 'YOUR_USER_ID';
 
 -- Check available readings
-SELECT r.* FROM readings r 
-WHERE r.is_active = true 
+SELECT r.* FROM readings r
+WHERE r.is_active = true
 AND r.id NOT IN (
-    SELECT reading_id FROM daily_readings 
-    WHERE user_id = 'YOUR_USER_ID' 
+    SELECT reading_id FROM daily_readings
+    WHERE user_id = 'YOUR_USER_ID'
     AND reading_date > CURRENT_DATE - INTERVAL '30 days'
 );
 ```
@@ -106,11 +114,13 @@ SELECT * FROM mark_reading_as_read('USER_ID', 'READING_ID');
 #### Test Flutter App:
 
 1. **Check Logs**: Look for detailed logs from each layer:
+
    - `DailyReadingCard` - Widget level
    - `DailyReadingProvider` - State management
    - `DailyReadingRemoteDataSource` - API calls
 
 2. **Common Log Patterns**:
+
    ```
    [DailyReadingCard] Widget: Current user found: abc123
    [DailyReadingProvider] Provider: Getting daily reading for user: abc123
@@ -140,12 +150,12 @@ SELECT id FROM preferences WHERE preferences_name = 'Psikologi';
 UPDATE users SET preference_id = (SELECT id FROM preferences WHERE preferences_name = 'Psikologi' LIMIT 1) WHERE id = 'YOUR_USER_ID';
 
 -- Insert sample scopes
-INSERT INTO scopes (name, preference_id, weight, description) VALUES 
+INSERT INTO scopes (name, preference_id, weight, description) VALUES
 ('Psikologi Kognitif', (SELECT id FROM preferences WHERE preferences_name = 'Psikologi' LIMIT 1), 5, 'Mental processes'),
 ('Psikologi Sosial', (SELECT id FROM preferences WHERE preferences_name = 'Psikologi' LIMIT 1), 3, 'Social interactions');
 
 -- Insert sample reading
-INSERT INTO readings (title, content, quote, scope_id, is_active) VALUES 
+INSERT INTO readings (title, content, quote, scope_id, is_active) VALUES
 ('Test Reading', 'This is a test reading content for daily reading system.', 'Test quote', (SELECT id FROM scopes WHERE name = 'Psikologi Kognitif' LIMIT 1), true);
 ```
 
@@ -163,6 +173,7 @@ INSERT INTO readings (title, content, quote, scope_id, is_active) VALUES
 ## Support
 
 If you continue to see errors, please share:
+
 1. The exact error message from logs
 2. The user ID you're testing with
 3. Results of the debug SQL queries above

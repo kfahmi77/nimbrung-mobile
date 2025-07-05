@@ -10,8 +10,9 @@ To implement the daily reading system, you need to apply the SQL schema to your 
 4. Run the SQL script
 
 This will create:
+
 - `user_preferences` table
-- `scopes` table  
+- `scopes` table
 - `readings` table
 - `daily_readings` table
 - `reading_feedbacks` table
@@ -25,6 +26,7 @@ The SQL script includes sample data for testing. You can modify or remove this s
 ## 3. Testing the Implementation
 
 Once the SQL is applied, the Flutter app will automatically:
+
 - Fetch daily readings for authenticated users
 - Display personalized content based on user preferences
 - Support feedback (thumbs up/down)
@@ -34,6 +36,7 @@ Once the SQL is applied, the Flutter app will automatically:
 ## 4. User Preferences Setup
 
 Users need to have preferences set up to get personalized readings. You can:
+
 - Add default preferences for existing users
 - Create a preference setup flow in your app
 - Import preference data if you have it from another source
@@ -41,6 +44,7 @@ Users need to have preferences set up to get personalized readings. You can:
 ## 5. Readings Content
 
 Add your reading content to the `readings` table. Each reading should:
+
 - Have a title and content
 - Optionally include a quote
 - Be linked to a scope for proper weighting

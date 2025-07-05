@@ -1,11 +1,13 @@
 # COMPLETE FIX FOR "structure of query does not match function result type" ERROR
 
 ## The Problem
+
 You're encountering this PostgreSQL error: **"structure of query does not match function result type"**
 
 This happens when:
+
 1. SQL function return types don't exactly match the database column types
-2. NULL handling is inconsistent 
+2. NULL handling is inconsistent
 3. Type casting is missing or incorrect
 
 ## COMPLETE SOLUTION (Follow All Steps)
@@ -33,11 +35,13 @@ This happens when:
 ### Step 3: Key Fixes Applied
 
 #### 1. **Exact Type Matching**
+
 - Changed all return types to exactly match database column types
 - Used `TEXT` instead of `VARCHAR` for consistency
 - Added explicit `::TEXT` casting for all text fields
 
 #### 2. **Proper NULL Handling**
+
 ```sql
 -- Before (caused errors):
 r.title as title,
@@ -49,11 +53,13 @@ COALESCE(s.name, 'General')::TEXT as scope_name
 ```
 
 #### 3. **Simplified Function Logic**
+
 - Separated generation and retrieval logic
 - Removed complex queries that caused type mismatches
 - Made functions more predictable
 
 #### 4. **Robust Flutter Model**
+
 - Enhanced `DailyReading.fromJson()` to handle any type variations
 - Added defensive programming for all fields
 - Better error handling in data source
@@ -63,17 +69,18 @@ COALESCE(s.name, 'General')::TEXT as scope_name
 **Test that the functions work:**
 
 1. In Supabase SQL Editor, run:
+
 ```sql
 -- Test function structure (should not error)
 SELECT * FROM get_daily_reading('00000000-0000-0000-0000-000000000000');
 
 -- Check function signatures
-SELECT 
+SELECT
     p.proname as function_name,
     pg_get_function_result(p.oid) as return_type
 FROM pg_proc p
 JOIN pg_namespace n ON p.pronamespace = n.oid
-WHERE n.nspname = 'public' 
+WHERE n.nspname = 'public'
 AND p.proname = 'get_daily_reading';
 ```
 
@@ -117,13 +124,16 @@ SELECT submit_reading_feedback('user-id', 'reading-id', 'up');
 ### Step 5: Common Issues and Solutions
 
 #### Issue: "function does not exist"
+
 - **Solution**: Make sure you ran the entire SQL script from `daily_reading_system_fixed.sql`
 
-#### Issue: "column does not exist"  
+#### Issue: "column does not exist"
+
 - **Solution**: Verify your table structure matches the expected schema
 
 #### Issue: "no data returned"
-- **Solution**: 
+
+- **Solution**:
   1. Make sure the user has a preference_id set
   2. Ensure there are readings and scopes in the database
   3. Check that scopes have weight > 0
@@ -133,20 +143,23 @@ SELECT submit_reading_feedback('user-id', 'reading-id', 'up');
 ### If You Still Get Errors:
 
 1. **Check Function Signatures:**
+
    ```sql
    -- In Supabase SQL Editor, run this to see exact function structure:
    \df get_daily_reading
    ```
 
 2. **Verify Data Types:**
+
    ```sql
    -- Check your actual column types:
-   SELECT column_name, data_type 
-   FROM information_schema.columns 
+   SELECT column_name, data_type
+   FROM information_schema.columns
    WHERE table_name = 'readings' AND table_schema = 'public';
    ```
 
 3. **Test with Minimal Data:**
+
    - Create a simple test reading
    - Test the function with a real user ID
    - Check the Flutter debug logs for detailed error info
@@ -180,7 +193,7 @@ The key is that PostgreSQL functions must have return types that EXACTLY match w
 ## Expected Behavior After Fix
 
 1. **First Time**: App generates a daily reading for the user
-2. **Same Day**: App returns the existing reading for today  
+2. **Same Day**: App returns the existing reading for today
 3. **Next Day**: App generates a new reading based on preferences
 4. **Feedback**: User can give thumbs up/down feedback
 5. **Mark as Read**: Reading is marked as read when user goes to discussion
@@ -191,7 +204,7 @@ The app now has comprehensive logging. Watch for these log messages:
 
 ```
 [DailyReadingRemoteDataSource] Starting getDailyReading for user: xxx
-[DailyReadingRemoteDataSource] Calling get_daily_reading RPC function  
+[DailyReadingRemoteDataSource] Calling get_daily_reading RPC function
 [DailyReadingRemoteDataSource] RPC response received: {...}
 ```
 

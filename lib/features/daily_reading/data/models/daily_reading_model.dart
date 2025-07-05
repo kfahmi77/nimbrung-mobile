@@ -27,9 +27,10 @@ class DailyReading {
       content: json['content']?.toString() ?? '',
       quote: json['quote']?.toString(),
       scopeName: json['scope_name']?.toString() ?? 'General',
-      readingDate: json['reading_date'] != null 
-          ? DateTime.parse(json['reading_date'].toString())
-          : DateTime.now(),
+      readingDate:
+          json['reading_date'] != null
+              ? DateTime.parse(json['reading_date'].toString())
+              : DateTime.now(),
       isRead: json['is_read'] == true,
       userFeedback: json['user_feedback']?.toString(),
     );

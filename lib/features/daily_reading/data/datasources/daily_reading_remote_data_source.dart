@@ -4,7 +4,11 @@ import '../../../../core/utils/logger.dart';
 
 abstract class DailyReadingRemoteDataSource {
   Future<DailyReading> getDailyReading(String userId);
-  Future<Map<String, dynamic>> submitFeedback(String userId, String readingId, String feedbackType);
+  Future<Map<String, dynamic>> submitFeedback(
+    String userId,
+    String readingId,
+    String feedbackType,
+  );
   Future<Map<String, dynamic>> markAsRead(String userId, String readingId);
 }
 
@@ -26,9 +30,10 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
         tag: 'DailyReadingRemoteDataSource',
       );
 
-      final response = await _supabase.rpc('get_daily_reading', params: {
-        'p_user_id': userId,
-      });
+      final response = await _supabase.rpc(
+        'get_daily_reading',
+        params: {'p_user_id': userId},
+      );
 
       AppLogger.debug(
         'RPC response type: ${response.runtimeType}',
@@ -67,16 +72,18 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
         tag: 'DailyReadingRemoteDataSource',
         error: e,
       );
-      
+
       // Handle specific "structure of query does not match function result type" error
-      if (e.message.contains('structure of query does not match function result type')) {
+      if (e.message.contains(
+        'structure of query does not match function result type',
+      )) {
         throw Exception(
           'Database function error: The SQL function return type doesn\'t match the database schema. '
           'Please apply the updated SQL from sql/fix_function_structure_error.sql to fix this issue. '
-          'Original error: ${e.message}'
+          'Original error: ${e.message}',
         );
       }
-      
+
       throw Exception('Database error: ${e.message}');
     } catch (e) {
       AppLogger.error(
@@ -90,9 +97,9 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> submitFeedback(
-    String userId, 
-    String readingId, 
-    String feedbackType
+    String userId,
+    String readingId,
+    String feedbackType,
   ) async {
     AppLogger.info(
       'Submitting feedback for user: $userId, reading: $readingId, type: $feedbackType',
@@ -105,11 +112,14 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
         tag: 'DailyReadingRemoteDataSource',
       );
 
-      final response = await _supabase.rpc('submit_reading_feedback', params: {
-        'p_user_id': userId,
-        'p_reading_id': readingId,
-        'p_feedback_type': feedbackType,
-      });
+      final response = await _supabase.rpc(
+        'submit_reading_feedback',
+        params: {
+          'p_user_id': userId,
+          'p_reading_id': readingId,
+          'p_feedback_type': feedbackType,
+        },
+      );
 
       AppLogger.debug(
         'Feedback submission response: $response',
@@ -141,7 +151,10 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> markAsRead(String userId, String readingId) async {
+  Future<Map<String, dynamic>> markAsRead(
+    String userId,
+    String readingId,
+  ) async {
     AppLogger.info(
       'Marking reading as read for user: $userId, reading: $readingId',
       tag: 'DailyReadingRemoteDataSource',
@@ -153,10 +166,10 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
         tag: 'DailyReadingRemoteDataSource',
       );
 
-      final response = await _supabase.rpc('mark_reading_as_read', params: {
-        'p_user_id': userId,
-        'p_reading_id': readingId,
-      });
+      final response = await _supabase.rpc(
+        'mark_reading_as_read',
+        params: {'p_user_id': userId, 'p_reading_id': readingId},
+      );
 
       AppLogger.debug(
         'Mark as read response: $response',

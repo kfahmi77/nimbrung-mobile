@@ -63,7 +63,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
       );
       return;
     }
-    
+
     final reading = ref.read(dailyReadingProvider).value;
     if (reading == null) {
       AppLogger.warning(
@@ -78,11 +78,9 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
       tag: 'DailyReadingCard',
     );
 
-    ref.read(dailyReadingProvider.notifier).submitFeedback(
-      _currentUserId!,
-      reading.id,
-      feedbackType,
-    );
+    ref
+        .read(dailyReadingProvider.notifier)
+        .submitFeedback(_currentUserId!, reading.id, feedbackType);
   }
 
   void _handleDiscussion() {
@@ -93,7 +91,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
       );
       return;
     }
-    
+
     final reading = ref.read(dailyReadingProvider).value;
     if (reading == null) {
       AppLogger.warning(
@@ -109,10 +107,9 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
     );
 
     // Mark as read when user goes to discussion
-    ref.read(dailyReadingProvider.notifier).markAsRead(
-      _currentUserId!,
-      reading.id,
-    );
+    ref
+        .read(dailyReadingProvider.notifier)
+        .markAsRead(_currentUserId!, reading.id);
 
     // Navigate to discussion
     AppLogger.info(
@@ -179,10 +176,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,10 +202,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,10 +233,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,7 +262,9 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
                   'Widget: Retry button pressed, reloading daily reading',
                   tag: 'DailyReadingCard',
                 );
-                ref.read(dailyReadingProvider.notifier).getDailyReading(_currentUserId!);
+                ref
+                    .read(dailyReadingProvider.notifier)
+                    .getDailyReading(_currentUserId!);
               }
             },
             child: Text('Coba Lagi'),
@@ -291,10 +281,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,10 +314,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,7 +329,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
               height: 1.4,
             ),
           ),
-          
+
           if (reading.quote != null) ...[
             16.height,
             Text(
@@ -358,9 +342,9 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
               ),
             ),
           ],
-          
+
           16.height,
-          
+
           // Scope info
           Text(
             'Ruang Lingkup: ${reading.scopeName}',
@@ -370,7 +354,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          
+
           24.height,
 
           // Action buttons
@@ -380,10 +364,7 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
                 child: GestureDetector(
                   onTap: _handleDiscussion,
                   child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 16,
-                    ),
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -407,16 +388,18 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
                 child: Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: reading.userFeedback == 'up' 
-                        ? AppColors.primary 
-                        : Colors.white,
+                    color:
+                        reading.userFeedback == 'up'
+                            ? AppColors.primary
+                            : Colors.white,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.thumb_up_alt_outlined,
-                    color: reading.userFeedback == 'up' 
-                        ? Colors.white 
-                        : AppColors.primary,
+                    color:
+                        reading.userFeedback == 'up'
+                            ? Colors.white
+                            : AppColors.primary,
                     size: 22,
                   ),
                 ),
@@ -427,16 +410,18 @@ class _DailyReadingCardState extends ConsumerState<DailyReadingCard> {
                 child: Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: reading.userFeedback == 'down' 
-                        ? AppColors.primary 
-                        : Colors.white,
+                    color:
+                        reading.userFeedback == 'down'
+                            ? AppColors.primary
+                            : Colors.white,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.thumb_down_off_alt_rounded,
-                    color: reading.userFeedback == 'down' 
-                        ? Colors.white 
-                        : AppColors.primary,
+                    color:
+                        reading.userFeedback == 'down'
+                            ? Colors.white
+                            : AppColors.primary,
                     size: 22,
                   ),
                 ),

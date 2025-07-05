@@ -10,9 +10,10 @@ import '../../domain/usecases/mark_as_read_usecase.dart';
 import '../../../../core/utils/logger.dart';
 
 // Data source provider
-final dailyReadingRemoteDataSourceProvider = Provider<DailyReadingRemoteDataSource>((ref) {
-  return DailyReadingRemoteDataSourceImpl(Supabase.instance.client);
-});
+final dailyReadingRemoteDataSourceProvider =
+    Provider<DailyReadingRemoteDataSource>((ref) {
+      return DailyReadingRemoteDataSourceImpl(Supabase.instance.client);
+    });
 
 // Repository provider
 final dailyReadingRepositoryProvider = Provider((ref) {
@@ -37,17 +38,20 @@ final markAsReadUseCaseProvider = Provider((ref) {
 });
 
 // State provider for daily reading
-final dailyReadingProvider = StateNotifierProvider<DailyReadingNotifier, AsyncValue<DailyReading?>>((ref) {
-  final getDailyReadingUseCase = ref.read(getDailyReadingUseCaseProvider);
-  final submitFeedbackUseCase = ref.read(submitFeedbackUseCaseProvider);
-  final markAsReadUseCase = ref.read(markAsReadUseCaseProvider);
-  
-  return DailyReadingNotifier(
-    getDailyReadingUseCase,
-    submitFeedbackUseCase,
-    markAsReadUseCase,
-  );
-});
+final dailyReadingProvider =
+    StateNotifierProvider<DailyReadingNotifier, AsyncValue<DailyReading?>>((
+      ref,
+    ) {
+      final getDailyReadingUseCase = ref.read(getDailyReadingUseCaseProvider);
+      final submitFeedbackUseCase = ref.read(submitFeedbackUseCaseProvider);
+      final markAsReadUseCase = ref.read(markAsReadUseCaseProvider);
+
+      return DailyReadingNotifier(
+        getDailyReadingUseCase,
+        submitFeedbackUseCase,
+        markAsReadUseCase,
+      );
+    });
 
 class DailyReadingNotifier extends StateNotifier<AsyncValue<DailyReading?>> {
   final GetDailyReadingUseCase _getDailyReadingUseCase;
@@ -65,9 +69,9 @@ class DailyReadingNotifier extends StateNotifier<AsyncValue<DailyReading?>> {
       'Provider: Getting daily reading for user: $userId',
       tag: 'DailyReadingProvider',
     );
-    
+
     state = const AsyncValue.loading();
-    
+
     try {
       final reading = await _getDailyReadingUseCase.call(userId);
       AppLogger.info(
@@ -85,7 +89,11 @@ class DailyReadingNotifier extends StateNotifier<AsyncValue<DailyReading?>> {
     }
   }
 
-  Future<void> submitFeedback(String userId, String readingId, String feedbackType) async {
+  Future<void> submitFeedback(
+    String userId,
+    String readingId,
+    String feedbackType,
+  ) async {
     final currentReading = state.value;
     if (currentReading == null) {
       AppLogger.warning(
@@ -102,9 +110,11 @@ class DailyReadingNotifier extends StateNotifier<AsyncValue<DailyReading?>> {
 
     try {
       await _submitFeedbackUseCase.call(userId, readingId, feedbackType);
-      
+
       // Update the local state with the new feedback
-      final updatedReading = currentReading.copyWith(userFeedback: feedbackType);
+      final updatedReading = currentReading.copyWith(
+        userFeedback: feedbackType,
+      );
       AppLogger.info(
         'Provider: Feedback submitted successfully, updating local state',
         tag: 'DailyReadingProvider',
@@ -137,7 +147,7 @@ class DailyReadingNotifier extends StateNotifier<AsyncValue<DailyReading?>> {
 
     try {
       await _markAsReadUseCase.call(userId, readingId);
-      
+
       // Update the local state to mark as read
       final updatedReading = currentReading.copyWith(isRead: true);
       AppLogger.info(
