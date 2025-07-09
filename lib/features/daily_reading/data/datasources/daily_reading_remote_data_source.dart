@@ -26,12 +26,12 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
 
     try {
       AppLogger.debug(
-        'Calling get_daily_reading RPC function',
+        'Calling get_user_daily_reading RPC function',
         tag: 'DailyReadingRemoteDataSource',
       );
 
       final response = await _supabase.rpc(
-        'get_daily_reading',
+        'get_user_daily_reading',
         params: {'p_user_id': userId},
       );
 
@@ -44,7 +44,7 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
         tag: 'DailyReadingRemoteDataSource',
       );
 
-      if (response == null || (response is List && response.isEmpty)) {
+      if (response == null) {
         AppLogger.warning(
           'No daily reading found for user: $userId',
           tag: 'DailyReadingRemoteDataSource',
@@ -52,14 +52,24 @@ class DailyReadingRemoteDataSourceImpl implements DailyReadingRemoteDataSource {
         throw Exception('No daily reading found');
       }
 
-      // The RPC function returns a single row
-      final data = response is List ? response.first : response;
+      // The RPC function returns a JSON object with success and reading data
+      final data = response as Map<String, dynamic>;
+
+      if (data['success'] != true) {
+        AppLogger.warning(
+          'Daily reading generation failed: ${data['message']}',
+          tag: 'DailyReadingRemoteDataSource',
+        );
+        throw Exception(data['message'] ?? 'Failed to get daily reading');
+      }
+
+      final readingData = data['reading'] as Map<String, dynamic>;
       AppLogger.debug(
-        'Processing reading data: $data',
+        'Processing reading data: $readingData',
         tag: 'DailyReadingRemoteDataSource',
       );
 
-      final reading = DailyReading.fromJson(data as Map<String, dynamic>);
+      final reading = DailyReading.fromJson(readingData);
       AppLogger.info(
         'Successfully parsed daily reading: ${reading.id}',
         tag: 'DailyReadingRemoteDataSource',
