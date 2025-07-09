@@ -1,5 +1,3 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../../user/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
