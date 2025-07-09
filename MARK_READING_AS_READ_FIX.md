@@ -1,6 +1,7 @@
 # Fix for Mark Reading as Read Error
 
 ## 🚨 **ERROR REPORTED**
+
 ```
 [DailyReadingRemoteDataSource] Mark as read response: {success: false, message: column "updated_at" of relation "daily_readings" does not exist}
 ```
@@ -10,17 +11,19 @@
 The error occurs because the `mark_reading_as_read` function is trying to update a column that doesn't exist in the `daily_readings` table.
 
 ### Current Problematic Function:
+
 ```sql
-UPDATE daily_readings 
-SET 
+UPDATE daily_readings
+SET
     is_read = true,
     updated_at = NOW()  -- ❌ This column doesn't exist!
-WHERE user_id = p_user_id 
-AND reading_id = p_reading_id 
+WHERE user_id = p_user_id
+AND reading_id = p_reading_id
 AND reading_date = CURRENT_DATE;
 ```
 
 ### Actual daily_readings Schema:
+
 ```sql
 create table public.daily_readings (
   id uuid not null default gen_random_uuid (),
@@ -42,6 +45,7 @@ create table public.daily_readings (
 The fix removes the non-existent `updated_at` column reference from the UPDATE statement.
 
 ### Fixed Function:
+
 ```sql
 CREATE OR REPLACE FUNCTION mark_reading_as_read(
     p_user_id UUID,
@@ -55,24 +59,24 @@ AS $$
 BEGIN
     -- Update daily reading to mark as read
     -- Note: Removed updated_at column as it doesn't exist in daily_readings table
-    UPDATE daily_readings 
+    UPDATE daily_readings
     SET is_read = true
-    WHERE user_id = p_user_id 
-    AND reading_id = p_reading_id 
+    WHERE user_id = p_user_id
+    AND reading_id = p_reading_id
     AND reading_date = CURRENT_DATE;
-    
+
     IF NOT FOUND THEN
         RETURN json_build_object(
             'success', false,
             'message', 'Daily reading not found for today'
         );
     END IF;
-    
+
     RETURN json_build_object(
         'success', true,
         'message', 'Reading marked as read successfully'
     );
-    
+
 EXCEPTION
     WHEN OTHERS THEN
         RETURN json_build_object(
@@ -86,12 +90,14 @@ $$;
 ## 🚀 **DEPLOYMENT INSTRUCTIONS**
 
 ### Option 1: Apply Complete Fix
+
 ```sql
 -- Apply the comprehensive fix file (includes this fix + other improvements)
 \i sql/comprehensive_daily_reading_fix.sql
 ```
 
 ### Option 2: Apply Only This Specific Fix
+
 ```sql
 -- Just fix the mark_reading_as_read function
 CREATE OR REPLACE FUNCTION mark_reading_as_read(
@@ -104,24 +110,24 @@ SECURITY DEFINER
 SET search_path = 'public'
 AS $$
 BEGIN
-    UPDATE daily_readings 
+    UPDATE daily_readings
     SET is_read = true
-    WHERE user_id = p_user_id 
-    AND reading_id = p_reading_id 
+    WHERE user_id = p_user_id
+    AND reading_id = p_reading_id
     AND reading_date = CURRENT_DATE;
-    
+
     IF NOT FOUND THEN
         RETURN json_build_object(
             'success', false,
             'message', 'Daily reading not found for today'
         );
     END IF;
-    
+
     RETURN json_build_object(
         'success', true,
         'message', 'Reading marked as read successfully'
     );
-    
+
 EXCEPTION
     WHEN OTHERS THEN
         RETURN json_build_object(
@@ -144,6 +150,7 @@ SELECT mark_reading_as_read('YOUR_USER_ID', 'YOUR_READING_ID');
 ```
 
 Expected success response:
+
 ```json
 {
   "success": true,
@@ -174,4 +181,4 @@ final response = await _supabase.rpc(
 **Impact**: ✅ **Fixes the mark-as-read functionality error**  
 **Risk**: 🟢 **Very Low - Only removes non-existent column reference**
 
-*Apply the fix and the mark-as-read functionality will work correctly.*
+_Apply the fix and the mark-as-read functionality will work correctly._

@@ -12,7 +12,8 @@ The daily reading system generates personalized daily readings for users based o
 
 **Purpose**: Retrieves or generates a daily reading for a specific user.
 
-**Returns**: 
+**Returns**:
+
 ```sql
 TABLE(
     reading_id UUID,
@@ -30,6 +31,7 @@ TABLE(
 ```
 
 **Usage**:
+
 ```sql
 SELECT * FROM get_user_daily_reading('user-uuid-here');
 ```
@@ -44,7 +46,8 @@ SELECT * FROM get_user_daily_reading('user-uuid-here');
 
 **Purpose**: Finds the next reading a user hasn't interacted with in a specific scope.
 
-**Returns**: 
+**Returns**:
+
 ```sql
 TABLE(
     reading_id UUID,
@@ -58,7 +61,8 @@ TABLE(
 )
 ```
 
-**Logic**: 
+**Logic**:
+
 - Prioritizes readings the user has never seen
 - Falls back to oldest interacted readings if all have been seen
 - Excludes readings from the last 30 days to avoid repetition
@@ -89,7 +93,8 @@ TABLE(
 
 **Purpose**: Generates a new daily reading for a specific user.
 
-**Returns**: 
+**Returns**:
+
 ```sql
 TABLE(
     reading_id UUID,
@@ -107,6 +112,7 @@ TABLE(
 ```
 
 **Logic**:
+
 1. Checks if user already has a daily reading for today
 2. Gets user's active preferences
 3. Uses different strategies based on user's reading history:
@@ -124,7 +130,8 @@ TABLE(
 
 **Purpose**: Generates daily readings for all users (used by cron job).
 
-**Returns**: 
+**Returns**:
+
 ```sql
 TABLE(
     user_id UUID,
@@ -135,6 +142,7 @@ TABLE(
 ```
 
 **Logic**:
+
 - Iterates through all users
 - Calls generate_daily_reading_for_user for each
 - Logs results including any errors
@@ -145,8 +153,9 @@ TABLE(
 ## Database Schema Relationships
 
 ### Tables Used:
+
 - **users**: User accounts
-- **preferences**: User reading preferences  
+- **preferences**: User reading preferences
 - **scopes**: Reading categories/topics
 - **readings**: Available reading content
 - **daily_readings**: Generated daily reading assignments
@@ -154,6 +163,7 @@ TABLE(
 - **user_reading_progress**: Reading completion tracking
 
 ### Key Relationships:
+
 ```
 users (1) → (n) preferences (n) → (1) scopes (1) → (n) readings
 users (1) → (n) daily_readings (n) → (1) readings
@@ -164,8 +174,9 @@ users (1) → (n) user_reading_progress (n) → (1) readings
 ## Data Types and Schema Compliance
 
 All functions use the correct data types matching the database schema:
+
 - **Character Varying Fields**: title, scope_name, author, category (with proper length limits)
-- **Text Fields**: content, source_url  
+- **Text Fields**: content, source_url
 - **UUID Fields**: All ID references
 - **Timestamp Fields**: All datetime fields with time zone support
 - **Array Fields**: tags (TEXT[])
@@ -173,6 +184,7 @@ All functions use the correct data types matching the database schema:
 ## Error Handling
 
 All functions include proper error handling:
+
 - Input validation for user existence
 - Graceful handling of missing preferences
 - Fallback strategies when no suitable readings are found
@@ -189,18 +201,21 @@ All functions include proper error handling:
 ## Usage Examples
 
 ### Get Daily Reading for User
+
 ```sql
 -- Get or generate daily reading for a user
 SELECT * FROM get_user_daily_reading('123e4567-e89b-12d3-a456-426614174000');
 ```
 
 ### Bulk Generate for All Users (Cron Job)
+
 ```sql
 -- Generate daily readings for all users (scheduled task)
 SELECT generate_daily_readings_for_all_users();
 ```
 
 ### Manual Generation for Specific User
+
 ```sql
 -- Manually generate a new daily reading
 SELECT * FROM generate_daily_reading_for_user('123e4567-e89b-12d3-a456-426614174000');
@@ -216,6 +231,7 @@ SELECT * FROM generate_daily_reading_for_user('123e4567-e89b-12d3-a456-426614174
 ## Testing and Validation
 
 All functions have been tested with:
+
 - Valid user IDs with preferences
 - Edge cases (no preferences, no available readings)
 - Bulk operations
@@ -224,5 +240,5 @@ All functions have been tested with:
 
 ---
 
-*Last Updated: July 2025*
-*Status: All functions tested and working*
+_Last Updated: July 2025_
+_Status: All functions tested and working_

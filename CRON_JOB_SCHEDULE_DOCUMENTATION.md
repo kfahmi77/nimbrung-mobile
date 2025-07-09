@@ -3,6 +3,7 @@
 ## Daily Reading Generation Schedule
 
 ### Current Schedule
+
 - **Local Time (GMT+7)**: 23:59:59 (Asia/Jakarta)
 - **UTC Time**: 16:59:59
 - **Cron Expression**: `59 59 16 * * *`
@@ -12,6 +13,7 @@
 The cron job is scheduled to run at **23:59:59 GMT+7** (Asia/Jakarta timezone), which corresponds to **16:59:59 UTC**.
 
 This timing ensures that:
+
 1. Daily readings are generated just before midnight local time
 2. Users get fresh content for the next day
 3. The system processes all users before the day officially ends
@@ -32,11 +34,13 @@ This timing ensures that:
 ### Implementation
 
 The cron job calls the PostgreSQL function:
+
 ```sql
 SELECT generate_daily_readings_for_all_users();
 ```
 
 This function:
+
 - Generates daily readings for all active users
 - Logs all operations in the `cron_job_logs` table
 - Handles errors gracefully
@@ -45,6 +49,7 @@ This function:
 ### Deployment Command
 
 To set up or update the cron job:
+
 ```sql
 \i sql/setup_cron_job.sql
 ```
@@ -52,17 +57,19 @@ To set up or update the cron job:
 ### Verification
 
 After deployment, verify the cron job is scheduled correctly:
+
 ```sql
-SELECT 
+SELECT
     jobname,
     schedule,
     command,
     active
-FROM cron.job 
+FROM cron.job
 WHERE jobname = 'daily-reading-generation';
 ```
 
 Expected output:
+
 ```
 jobname                  | schedule      | command                                    | active
 -------------------------|---------------|--------------------------------------------|---------
@@ -72,8 +79,9 @@ daily-reading-generation | 59 59 16 * * * | SELECT generate_daily_readings_for_a
 ### Monitoring
 
 Monitor cron job execution through the logs:
+
 ```sql
-SELECT 
+SELECT
     job_name,
     status,
     message,
@@ -81,21 +89,21 @@ SELECT
     users_processed,
     readings_generated,
     created_at
-FROM cron_job_logs 
+FROM cron_job_logs
 WHERE job_name = 'daily_reading_bulk_generation'
-ORDER BY created_at DESC 
+ORDER BY created_at DESC
 LIMIT 10;
 ```
 
 ### Timezone Conversion Reference
 
-| Local Time (GMT+7) | UTC Time | Cron Expression |
-|-------------------|----------|-----------------|
-| 00:00:00 | 17:00:00 | `0 0 17 * * *` |
-| 06:00:00 | 23:00:00 | `0 0 23 * * *` |
-| 12:00:00 | 05:00:00 | `0 0 5 * * *` |
-| 18:00:00 | 11:00:00 | `0 0 11 * * *` |
-| **23:59:59** | **16:59:59** | **`59 59 16 * * *`** |
+| Local Time (GMT+7) | UTC Time     | Cron Expression      |
+| ------------------ | ------------ | -------------------- |
+| 00:00:00           | 17:00:00     | `0 0 17 * * *`       |
+| 06:00:00           | 23:00:00     | `0 0 23 * * *`       |
+| 12:00:00           | 05:00:00     | `0 0 5 * * *`        |
+| 18:00:00           | 11:00:00     | `0 0 11 * * *`       |
+| **23:59:59**       | **16:59:59** | **`59 59 16 * * *`** |
 
 ### Notes
 
@@ -111,5 +119,5 @@ LIMIT 10;
 
 ---
 
-*Last Updated: July 2025*
-*Status: Scheduled for 23:59:59 GMT+7 (16:59:59 UTC)*
+_Last Updated: July 2025_
+_Status: Scheduled for 23:59:59 GMT+7 (16:59:59 UTC)_
